@@ -1,13 +1,13 @@
 package org.springframework.web.servlet.mvc.condition;
 
-import org.springframework.http.MediaType;
+import org.springframework.http.MyMediaType;
 import org.springframework.lang.Nullable;
-import org.springframework.web.HttpMediaTypeException;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
-import org.springframework.web.accept.ContentNegotiationManager;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.MyHttpMediaTypeException;
+import org.springframework.web.MyHttpMediaTypeNotAcceptableException;
+import org.springframework.web.accept.MyContentNegotiationManager;
+import org.springframework.web.context.request.MyServletWebRequest;
+
+import org.springframework.web.cors.MyCorsUtils;
 import org.springframework.web.servlet.mvc.condition.MyHeadersRequestCondition.HeaderExpression;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +26,7 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
     private static final MyProducesRequestCondition EMPTY_CONDITION = new MyProducesRequestCondition();
 
 
-    private final ContentNegotiationManager contentNegotiationManager;
+    private final MyContentNegotiationManager contentNegotiationManager;
 
     private final List<ProduceMediaTypeExpression> expressions;
 
@@ -40,19 +40,19 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
     }
 
     public MyProducesRequestCondition(String[] produces, @Nullable String[] headers,
-                                    @Nullable ContentNegotiationManager manager) {
+                                    @Nullable MyContentNegotiationManager manager) {
 
         this.expressions = new ArrayList<>(parseExpressions(produces, headers));
         Collections.sort(this.expressions);
-        this.contentNegotiationManager = (manager != null ? manager : new ContentNegotiationManager());
+        this.contentNegotiationManager = (manager != null ? manager : new MyContentNegotiationManager());
     }
 
     private MyProducesRequestCondition(Collection<ProduceMediaTypeExpression> expressions,
-                                     @Nullable ContentNegotiationManager manager) {
+                                     @Nullable MyContentNegotiationManager manager) {
 
         this.expressions = new ArrayList<>(expressions);
         Collections.sort(this.expressions);
-        this.contentNegotiationManager = (manager != null ? manager : new ContentNegotiationManager());
+        this.contentNegotiationManager = (manager != null ? manager : new MyContentNegotiationManager());
     }
     @Override
     public MyProducesRequestCondition combine(MyProducesRequestCondition other) {
@@ -62,18 +62,18 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
     @Override
     @Nullable
     public MyProducesRequestCondition getMatchingCondition(HttpServletRequest request) {
-        if (CorsUtils.isPreFlightRequest(request)) {
+        if (MyCorsUtils.isPreFlightRequest(request)) {
             return PRE_FLIGHT_MATCH;
         }
         if (isEmpty()) {
             return this;
         }
 
-        List<MediaType> acceptedMediaTypes;
+        List<MyMediaType> acceptedMediaTypes;
         try {
             acceptedMediaTypes = getAcceptedMediaTypes(request);
         }
-        catch (HttpMediaTypeException ex) {
+        catch (MyHttpMediaTypeException ex) {
             return null;
         }
 
@@ -82,7 +82,7 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
         if (!result.isEmpty()) {
             return new MyProducesRequestCondition(result, this.contentNegotiationManager);
         }
-        else if (acceptedMediaTypes.contains(MediaType.ALL)) {
+        else if (acceptedMediaTypes.contains(MyMediaType.ALL)) {
             return EMPTY_CONDITION;
         }
         else {
@@ -90,8 +90,8 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
         }
     }
 
-    private List<MediaType> getAcceptedMediaTypes(HttpServletRequest request) throws HttpMediaTypeNotAcceptableException {
-        return this.contentNegotiationManager.resolveMediaTypes(new ServletWebRequest(request));
+    private List<MyMediaType> getAcceptedMediaTypes(HttpServletRequest request) throws MyHttpMediaTypeNotAcceptableException {
+        return this.contentNegotiationManager.resolveMediaTypes(new MyServletWebRequest(request));
     }
 
     @Override
@@ -106,7 +106,7 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
             for (String header : headers) {
                 HeaderExpression expr = new HeaderExpression(header);
                 if ("Accept".equalsIgnoreCase(expr.name) && expr.value != null) {
-                    for (MediaType mediaType : MediaType.parseMediaTypes(expr.value)) {
+                    for (MyMediaType mediaType : MyMediaType.parseMediaTypes(expr.value)) {
                         result.add(new ProduceMediaTypeExpression(mediaType, expr.isNegated));
                     }
                 }
@@ -126,7 +126,7 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
 
     static class ProduceMediaTypeExpression extends MyAbstractMediaTypeExpression {
 
-        ProduceMediaTypeExpression(MediaType mediaType, boolean negated) {
+        ProduceMediaTypeExpression(MyMediaType mediaType, boolean negated) {
             super(mediaType, negated);
         }
 
@@ -134,13 +134,13 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
             super(expression);
         }
 
-        public final boolean match(List<MediaType> acceptedMediaTypes) {
+        public final boolean match(List<MyMediaType> acceptedMediaTypes) {
             boolean match = matchMediaType(acceptedMediaTypes);
             return (!isNegated() ? match : !match);
         }
 
-        private boolean matchMediaType(List<MediaType> acceptedMediaTypes) {
-            for (MediaType acceptedMediaType : acceptedMediaTypes) {
+        private boolean matchMediaType(List<MyMediaType> acceptedMediaTypes) {
+            for (MyMediaType acceptedMediaType : acceptedMediaTypes) {
                 if (getMediaType().isCompatibleWith(acceptedMediaType)) {
                     return true;
                 }

@@ -2,7 +2,7 @@ package org.springframework.web.servlet.mvc.condition;
 
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.util.WebUtils;
+import org.springframework.web.util.MyWebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -83,7 +83,7 @@ public class MyParamsRequestCondition extends MyAbstractRequestCondition<MyParam
 
         @Override
         protected boolean matchName(HttpServletRequest request) {
-            return (WebUtils.hasSubmitParameter(request, this.name) ||
+            return (MyWebUtils.hasSubmitParameter(request, this.name) ||
                     request.getParameterMap().containsKey(this.name));
         }
 

@@ -21,10 +21,10 @@ import javax.servlet.ServletRequest;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.web.bind.MyServletRequestDataBinder;
 import org.springframework.web.servlet.MyHandlerMapping;
 
-public class MyExtendedServletRequestDataBinder extends ServletRequestDataBinder {
+public class MyExtendedServletRequestDataBinder extends MyServletRequestDataBinder {
 
 
     public MyExtendedServletRequestDataBinder(@Nullable Object target) {

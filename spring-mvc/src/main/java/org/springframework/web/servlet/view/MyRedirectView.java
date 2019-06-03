@@ -1,20 +1,22 @@
 package org.springframework.web.servlet.view;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpStatus;
+
+import org.springframework.http.MyHttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.MyWebApplicationContext;
+
 import org.springframework.web.servlet.MyHandlerMapping;
 import org.springframework.web.servlet.MySmartView;
 import org.springframework.web.servlet.MyView;
 import org.springframework.web.servlet.support.MyRequestContextUtils;
 import org.springframework.web.servlet.support.MyRequestDataValueProcessor;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.web.util.UriUtils;
-import org.springframework.web.util.WebUtils;
+import org.springframework.web.util.MyUriComponentsBuilder;
+import org.springframework.web.util.MyUriUtils;
+import org.springframework.web.util.MyWebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,7 +54,7 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
     private String encodingScheme;
 
     @Nullable
-    private HttpStatus statusCode;
+    private MyHttpStatus statusCode;
 
     private boolean exposeModelAttributes = true;
 
@@ -90,7 +92,7 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
     protected String updateTargetUrl(String targetUrl, Map<String, Object> model,
                                      HttpServletRequest request, HttpServletResponse response) {
 
-        WebApplicationContext wac = getWebApplicationContext();
+        MyWebApplicationContext wac = getWebApplicationContext();
         if (wac == null) {
             wac = MyRequestContextUtils.findWebApplicationContext(request, getServletContext());
         }
@@ -109,7 +111,7 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
 
         String encodedURL = (isRemoteHost(targetUrl) ? targetUrl : response.encodeRedirectURL(targetUrl));
         if (http10Compatible) {
-            HttpStatus attributeStatusCode = (HttpStatus) request.getAttribute(MyView.RESPONSE_STATUS_ATTRIBUTE);
+            MyHttpStatus attributeStatusCode = (MyHttpStatus) request.getAttribute(MyView.RESPONSE_STATUS_ATTRIBUTE);
             if (this.statusCode != null) {
                 response.setStatus(this.statusCode.value());
                 response.setHeader("Location", encodedURL);
@@ -124,7 +126,7 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
             }
         }
         else {
-            HttpStatus statusCode = getHttp11StatusCode(request, response, targetUrl);
+            MyHttpStatus statusCode = getHttp11StatusCode(request, response, targetUrl);
             response.setStatus(statusCode.value());
             response.setHeader("Location", encodedURL);
         }
@@ -134,7 +136,7 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
         if (ObjectUtils.isEmpty(getHosts())) {
             return false;
         }
-        String targetHost = UriComponentsBuilder.fromUriString(targetUrl).build().getHost();
+        String targetHost = MyUriComponentsBuilder.fromUriString(targetUrl).build().getHost();
         if (StringUtils.isEmpty(targetHost)) {
             return false;
         }
@@ -146,17 +148,17 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
         return true;
     }
 
-    protected HttpStatus getHttp11StatusCode(
+    protected MyHttpStatus getHttp11StatusCode(
             HttpServletRequest request, HttpServletResponse response, String targetUrl) {
 
         if (this.statusCode != null) {
             return this.statusCode;
         }
-        HttpStatus attributeStatusCode = (HttpStatus) request.getAttribute(MyView.RESPONSE_STATUS_ATTRIBUTE);
+        MyHttpStatus attributeStatusCode = (MyHttpStatus) request.getAttribute(MyView.RESPONSE_STATUS_ATTRIBUTE);
         if (attributeStatusCode != null) {
             return attributeStatusCode;
         }
-        return HttpStatus.SEE_OTHER;
+        return MyHttpStatus.SEE_OTHER;
     }
 
     protected final String createTargetUrl(Map<String, Object> model, HttpServletRequest request)
@@ -178,7 +180,7 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
             enc = request.getCharacterEncoding();
         }
         if (enc == null) {
-            enc = WebUtils.DEFAULT_CHARACTER_ENCODING;
+            enc = MyWebUtils.DEFAULT_CHARACTER_ENCODING;
         }
 
         if (this.expandUriTemplateVariables && StringUtils.hasText(targetUrl)) {
@@ -349,7 +351,7 @@ public class MyRedirectView  extends MyAbstractUrlBasedView implements MySmartVi
                 throw new IllegalArgumentException("Model has no value for key '" + name + "'");
             }
             result.append(targetUrl.substring(endLastMatch, matcher.start()));
-            result.append(UriUtils.encodePathSegment(value.toString(), encodingScheme));
+            result.append(MyUriUtils.encodePathSegment(value.toString(), encodingScheme));
             endLastMatch = matcher.end();
         }
         result.append(targetUrl.substring(endLastMatch, targetUrl.length()));

@@ -4,7 +4,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.UrlPathHelper;
+import org.springframework.web.util.MyUrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -19,7 +19,7 @@ public final class MyPatternsRequestCondition extends MyAbstractRequestCondition
 
     private final Set<String> patterns;
 
-    private final UrlPathHelper pathHelper;
+    private final MyUrlPathHelper pathHelper;
 
     private final PathMatcher pathMatcher;
 
@@ -33,7 +33,7 @@ public final class MyPatternsRequestCondition extends MyAbstractRequestCondition
         this(Arrays.asList(patterns), null, null, true, true, null);
     }
 
-    public MyPatternsRequestCondition(String[] patterns, @Nullable UrlPathHelper urlPathHelper,
+    public MyPatternsRequestCondition(String[] patterns, @Nullable MyUrlPathHelper urlPathHelper,
                                     @Nullable PathMatcher pathMatcher, boolean useSuffixPatternMatch,
                                     boolean useTrailingSlashMatch, @Nullable List<String> fileExtensions) {
 
@@ -41,12 +41,12 @@ public final class MyPatternsRequestCondition extends MyAbstractRequestCondition
                 useTrailingSlashMatch, fileExtensions);
     }
 
-    private MyPatternsRequestCondition(Collection<String> patterns, @Nullable UrlPathHelper urlPathHelper,
+    private MyPatternsRequestCondition(Collection<String> patterns, @Nullable MyUrlPathHelper urlPathHelper,
                                      @Nullable PathMatcher pathMatcher, boolean useSuffixPatternMatch,
                                      boolean useTrailingSlashMatch, @Nullable List<String> fileExtensions) {
 
         this.patterns = Collections.unmodifiableSet(prependLeadingSlash(patterns));
-        this.pathHelper = (urlPathHelper != null ? urlPathHelper : new UrlPathHelper());
+        this.pathHelper = (urlPathHelper != null ? urlPathHelper : new MyUrlPathHelper());
         this.pathMatcher = (pathMatcher != null ? pathMatcher : new AntPathMatcher());
         this.useSuffixPatternMatch = useSuffixPatternMatch;
         this.useTrailingSlashMatch = useTrailingSlashMatch;
@@ -71,10 +71,6 @@ public final class MyPatternsRequestCondition extends MyAbstractRequestCondition
             result.add(pattern);
         }
         return result;
-    }
-    @Override
-    protected Collection<String> getContent() {
-        return this.patterns;
     }
 
 
@@ -131,6 +127,11 @@ public final class MyPatternsRequestCondition extends MyAbstractRequestCondition
         return matches;
     }
 
+    @Override
+    protected Collection<String> getContent() {
+        return this.patterns;
+    }
+
     @Nullable
     private String getMatchingPattern(String pattern, String lookupPath) {
         if (pattern.equals(lookupPath)) {
@@ -169,5 +170,10 @@ public final class MyPatternsRequestCondition extends MyAbstractRequestCondition
 
     public Set<String> getPatterns() {
         return this.patterns;
+    }
+
+    @Override
+    public int hashCode() {
+        return getContent().hashCode();
     }
 }

@@ -1,9 +1,9 @@
 package com.zwd.web.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.MyGetMapping;
+import org.springframework.web.bind.annotation.MyRequestMapping;
 import org.springframework.web.servlet.MyModelAndView;
 
 /**
@@ -15,7 +15,7 @@ import org.springframework.web.servlet.MyModelAndView;
 @Controller
 public class HelloController {
 
-    @GetMapping(value = "hello")
+    @MyGetMapping(value = "hello")
     public MyModelAndView index(String name, MyModelAndView modelAndView) {
 
         modelAndView.addObject("message",name);
@@ -23,7 +23,7 @@ public class HelloController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "getname")
+    @MyRequestMapping(value = "getname")
     public String getName() {
 
         return "index";

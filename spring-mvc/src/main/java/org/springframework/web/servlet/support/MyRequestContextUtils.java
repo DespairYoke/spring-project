@@ -5,12 +5,14 @@ import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.MyContextLoader;
+import org.springframework.web.context.MyWebApplicationContext;
+import org.springframework.web.context.support.MyWebApplicationContextUtils;
+
 import org.springframework.web.servlet.*;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.MyUriComponents;
+import org.springframework.web.util.MyUriComponentsBuilder;
+
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -55,17 +57,17 @@ public abstract class MyRequestContextUtils {
     }
 
     @Nullable
-    public static WebApplicationContext findWebApplicationContext(
+    public static MyWebApplicationContext findWebApplicationContext(
             HttpServletRequest request, @Nullable ServletContext servletContext) {
 
-        WebApplicationContext webApplicationContext = (WebApplicationContext) request.getAttribute(
+        MyWebApplicationContext webApplicationContext = (MyWebApplicationContext) request.getAttribute(
                 MyDispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE);
         if (webApplicationContext == null) {
             if (servletContext != null) {
-                webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+                webApplicationContext = MyWebApplicationContextUtils.getWebApplicationContext(servletContext);
             }
             if (webApplicationContext == null) {
-                webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+                webApplicationContext = MyContextLoader.getCurrentWebApplicationContext();
             }
         }
         return webApplicationContext;
@@ -87,7 +89,7 @@ public abstract class MyRequestContextUtils {
             return;
         }
 
-        UriComponents uriComponents = UriComponentsBuilder.fromUriString(location).build();
+        MyUriComponents uriComponents = MyUriComponentsBuilder.fromUriString(location).build();
         flashMap.setTargetRequestPath(uriComponents.getPath());
         flashMap.addTargetRequestParams(uriComponents.getQueryParams());
 

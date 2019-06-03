@@ -19,18 +19,17 @@ package org.springframework.web.servlet.mvc.method.annotation;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.PatternMatchUtils;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
-import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.context.request.MyNativeWebRequest;
+import org.springframework.web.method.support.MyHandlerMethodReturnValueHandler;
+import org.springframework.web.method.support.MyModelAndViewContainer;
 import org.springframework.web.servlet.MyModelAndView;
 import org.springframework.web.servlet.MySmartView;
 import org.springframework.web.servlet.MyView;
 
-public class MyModelAndViewMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
+public class MyModelAndViewMethodReturnValueHandler implements MyHandlerMethodReturnValueHandler {
 
     @Nullable
     private String[] redirectPatterns;
-
 
 
     public void setRedirectPatterns(@Nullable String... redirectPatterns) {
@@ -52,9 +51,11 @@ public class MyModelAndViewMethodReturnValueHandler implements HandlerMethodRetu
         return MyModelAndView.class.isAssignableFrom(returnType.getParameterType());
     }
 
+
+
     @Override
     public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
-                                  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+                                  MyModelAndViewContainer mavContainer, MyNativeWebRequest webRequest) throws Exception {
 
         if (returnValue == null) {
             mavContainer.setRequestHandled(true);

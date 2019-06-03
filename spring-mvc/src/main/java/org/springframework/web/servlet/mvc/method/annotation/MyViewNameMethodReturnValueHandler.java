@@ -3,9 +3,10 @@ package org.springframework.web.servlet.mvc.method.annotation;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.PatternMatchUtils;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
-import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.context.request.MyNativeWebRequest;
+
+import org.springframework.web.method.support.MyHandlerMethodReturnValueHandler;
+import org.springframework.web.method.support.MyModelAndViewContainer;
 
 /**
  * TODO...
@@ -13,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  * @author zwd
  * @since 2019-05-11
  **/
-public class MyViewNameMethodReturnValueHandler implements HandlerMethodReturnValueHandler {
+public class MyViewNameMethodReturnValueHandler implements MyHandlerMethodReturnValueHandler {
 
 
     @Nullable
@@ -50,7 +51,7 @@ public class MyViewNameMethodReturnValueHandler implements HandlerMethodReturnVa
 
     @Override
     public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
-                                  ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+                                  MyModelAndViewContainer mavContainer, MyNativeWebRequest webRequest) throws Exception {
 
         if (returnValue instanceof CharSequence) {
             String viewName = returnValue.toString();

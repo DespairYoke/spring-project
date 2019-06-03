@@ -3,13 +3,12 @@ package org.springframework.web.servlet.handler;
 import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
-import org.springframework.web.context.support.WebApplicationObjectSupport;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.context.support.MyWebApplicationObjectSupport;
+
 import org.springframework.web.servlet.MyHandlerExecutionChain;
 import org.springframework.web.servlet.MyHandlerInterceptor;
 import org.springframework.web.servlet.MyHandlerMapping;
-import org.springframework.web.util.UrlPathHelper;
+import org.springframework.web.util.MyUrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.List;
  * @author zwd
  * @since 2019-04-22
  **/
-public abstract class MyAbstractHandlerMapping extends WebApplicationObjectSupport implements MyHandlerMapping {
+public abstract class MyAbstractHandlerMapping extends MyWebApplicationObjectSupport implements MyHandlerMapping {
 
 
     @Nullable
@@ -29,7 +28,7 @@ public abstract class MyAbstractHandlerMapping extends WebApplicationObjectSuppo
 
     private PathMatcher pathMatcher = new AntPathMatcher();
 
-    private UrlPathHelper urlPathHelper = new UrlPathHelper();
+    private MyUrlPathHelper urlPathHelper = new MyUrlPathHelper();
 
     private final List<MyHandlerInterceptor> adaptedInterceptors = new ArrayList<>();
 

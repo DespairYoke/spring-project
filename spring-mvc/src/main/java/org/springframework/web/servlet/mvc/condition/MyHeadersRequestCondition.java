@@ -2,7 +2,7 @@ package org.springframework.web.servlet.mvc.condition;
 
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.MyCorsUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -39,7 +39,7 @@ public class MyHeadersRequestCondition extends MyAbstractRequestCondition<MyHead
     @Override
     @Nullable
     public MyHeadersRequestCondition getMatchingCondition(HttpServletRequest request) {
-        if (CorsUtils.isPreFlightRequest(request)) {
+        if (MyCorsUtils.isPreFlightRequest(request)) {
             return PRE_FLIGHT_MATCH;
         }
         for (HeaderExpression expression : expressions) {

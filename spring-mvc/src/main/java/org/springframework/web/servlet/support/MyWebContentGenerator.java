@@ -1,7 +1,7 @@
 package org.springframework.web.servlet.support;
 
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.MyCacheControl;
+import org.springframework.http.MyHttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
@@ -46,7 +46,7 @@ public class MyWebContentGenerator {
     private boolean useCacheControlNoStore = true;
 
     @Nullable
-    private CacheControl cacheControl;
+    private MyCacheControl cacheControl;
 
     private int cacheSeconds = -1;
 
@@ -65,18 +65,18 @@ public class MyWebContentGenerator {
             }
         }
         else {
-            CacheControl cControl;
+            MyCacheControl cControl;
             if (cacheSeconds > 0) {
-                cControl = CacheControl.maxAge(cacheSeconds, TimeUnit.SECONDS);
+                cControl = MyCacheControl.maxAge(cacheSeconds, TimeUnit.SECONDS);
                 if (this.alwaysMustRevalidate) {
                     cControl = cControl.mustRevalidate();
                 }
             }
             else if (cacheSeconds == 0) {
-                cControl = (this.useCacheControlNoStore ? CacheControl.noStore() : CacheControl.noCache());
+                cControl = (this.useCacheControlNoStore ? MyCacheControl.noStore() : MyCacheControl.noCache());
             }
             else {
-                cControl = CacheControl.empty();
+                cControl = MyCacheControl.empty();
             }
             applyCacheControl(response, cControl);
         }
@@ -131,7 +131,7 @@ public class MyWebContentGenerator {
         }
     }
 
-    protected final void applyCacheControl(HttpServletResponse response, CacheControl cacheControl) {
+    protected final void applyCacheControl(HttpServletResponse response, MyCacheControl cacheControl) {
         String ccValue = cacheControl.getHeaderValue();
         if (ccValue != null) {
             // Set computed HTTP 1.1 Cache-Control header
@@ -163,12 +163,12 @@ public class MyWebContentGenerator {
     }
 
     private Collection<String> getVaryRequestHeadersToAdd(HttpServletResponse response, String[] varyByRequestHeaders) {
-        if (!response.containsHeader(HttpHeaders.VARY)) {
+        if (!response.containsHeader(MyHttpHeaders.VARY)) {
             return Arrays.asList(varyByRequestHeaders);
         }
         Collection<String> result = new ArrayList<>(varyByRequestHeaders.length);
         Collections.addAll(result, varyByRequestHeaders);
-        for (String header : response.getHeaders(HttpHeaders.VARY)) {
+        for (String header : response.getHeaders(MyHttpHeaders.VARY)) {
             for (String existing : StringUtils.tokenizeToStringArray(header, ",")) {
                 if ("*".equals(existing)) {
                     return Collections.emptyList();

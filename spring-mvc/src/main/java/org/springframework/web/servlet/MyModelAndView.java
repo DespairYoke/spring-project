@@ -1,6 +1,6 @@
 package org.springframework.web.servlet;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MyHttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.ui.ModelMap;
 
@@ -23,9 +23,9 @@ public class MyModelAndView {
 
     /** Optional HTTP status for the response */
     @Nullable
-    private HttpStatus status;
+    private MyHttpStatus status;
 
-    public MyModelAndView(@Nullable String viewName, @Nullable Map<String, ?> model, @Nullable HttpStatus status) {
+    public MyModelAndView(@Nullable String viewName, @Nullable Map<String, ?> model, @Nullable MyHttpStatus status) {
         this.view = viewName;
         if (model != null) {
             getModelMap().addAllAttributes(model);
@@ -34,7 +34,7 @@ public class MyModelAndView {
     }
 
     @Nullable
-    public HttpStatus getStatus() {
+    public MyHttpStatus getStatus() {
         return this.status;
     }
 

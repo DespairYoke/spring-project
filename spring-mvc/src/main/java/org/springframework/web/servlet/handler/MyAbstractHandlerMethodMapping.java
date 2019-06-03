@@ -8,10 +8,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.lang.Nullable;
 import org.springframework.util.*;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsUtils;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.util.UrlPathHelper;
+
+
+import org.springframework.web.method.MyHandlerMethod;
+
+import org.springframework.web.util.MyUrlPathHelper;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -34,7 +36,8 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
 
     private boolean detectHandlerMethodsInAncestorContexts = false;
 
-    private UrlPathHelper urlPathHelper = new UrlPathHelper();
+
+    private MyUrlPathHelper urlPathHelper = new MyUrlPathHelper();
 
 
     static {
@@ -46,11 +49,11 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
     @Nullable
     private MyHandlerMethodMappingNamingStrategy<T> namingStrategy;
 
-    protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+    protected MyHandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
 
         String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 
-        HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
+        MyHandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
 
         return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 
@@ -59,13 +62,13 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
 
     protected abstract Set<String> getMappingPathPatterns(T mapping);
 
-    public UrlPathHelper getUrlPathHelper() {
+    public MyUrlPathHelper getUrlPathHelper() {
         return urlPathHelper;
     }
 
 
     @Nullable
-    protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
+    protected MyHandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
         List<Match> matches = new ArrayList<>();
         List<T> directPathMatches = this.mappingRegistry.getMappingsByUrl(lookupPath);
         if (directPathMatches != null) {
@@ -82,18 +85,18 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
                 logger.trace("Found " + matches.size() + " matching mapping(s) for [" + lookupPath + "] : " + matches);
             }
             Match bestMatch = matches.get(0);
-            if (matches.size() > 1) {
-                if (CorsUtils.isPreFlightRequest(request)) {
+//            if (matches.size() > 1) {
+//                if (MyCorsUtils.isPreFlightRequest(request)) {
 //                    return PREFLIGHT_AMBIGUOUS_MATCH;
-                }
-                Match secondBestMatch = matches.get(1);
-                if (comparator.compare(bestMatch, secondBestMatch) == 0) {
-                    Method m1 = bestMatch.handlerMethod.getMethod();
-                    Method m2 = secondBestMatch.handlerMethod.getMethod();
-                    throw new IllegalStateException("Ambiguous handler methods mapped for HTTP path '" +
-                            request.getRequestURL() + "': {" + m1 + ", " + m2 + "}");
-                }
-            }
+//                }
+//                Match secondBestMatch = matches.get(1);
+//                if (comparator.compare(bestMatch, secondBestMatch) == 0) {
+//                    Method m1 = bestMatch.handlerMethod.getMethod();
+//                    Method m2 = secondBestMatch.handlerMethod.getMethod();
+//                    throw new IllegalStateException("Ambiguous handler methods mapped for HTTP path '" +
+//                            request.getRequestURL() + "': {" + m1 + ", " + m2 + "}");
+//                }
+//            }
 //            handleMatch(bestMatch.mapping, lookupPath, request);
             return bestMatch.handlerMethod;
         }
@@ -118,15 +121,15 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
 
         private final Map<T, MappingRegistration<T>> registry = new HashMap<>();
 
-        private final Map<T, HandlerMethod> mappingLookup = new LinkedHashMap<>();
+        private final Map<T, MyHandlerMethod> mappingLookup = new LinkedHashMap<>();
 
         private final MultiValueMap<String, T> urlLookup = new LinkedMultiValueMap<>();
 
         private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-        private final Map<HandlerMethod, CorsConfiguration> corsLookup = new ConcurrentHashMap<>();
 
-        private final Map<String, List<HandlerMethod>> nameLookup = new ConcurrentHashMap<>();
+
+        private final Map<String, List<MyHandlerMethod>> nameLookup = new ConcurrentHashMap<>();
 
         @Nullable
         public List<T> getMappingsByUrl(String urlPath) {
@@ -136,7 +139,7 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
         public void register(T mapping, Object handler, Method method) {
             this.readWriteLock.writeLock().lock();
             try {
-                HandlerMethod handlerMethod = createHandlerMethod(handler, method);
+                MyHandlerMethod handlerMethod = createHandlerMethod(handler, method);
                 assertUniqueMethodMapping(handlerMethod, mapping);
 
                 if (logger.isInfoEnabled()) {
@@ -155,10 +158,6 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
                     addMappingName(name, handlerMethod);
                 }
 
-                CorsConfiguration corsConfig = initCorsConfiguration(handler, method, mapping);
-                if (corsConfig != null) {
-                    this.corsLookup.put(handlerMethod, corsConfig);
-                }
 
                 this.registry.put(mapping, new MappingRegistration<>(mapping, handlerMethod, directUrls, name));
             }
@@ -179,8 +178,8 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
         }
 
 
-        private void assertUniqueMethodMapping(HandlerMethod newHandlerMethod, T mapping) {
-            HandlerMethod handlerMethod = this.mappingLookup.get(mapping);
+        private void assertUniqueMethodMapping(MyHandlerMethod newHandlerMethod, T mapping) {
+            MyHandlerMethod handlerMethod = this.mappingLookup.get(mapping);
             if (handlerMethod != null && !handlerMethod.equals(newHandlerMethod)) {
                 throw new IllegalStateException(
                         "Ambiguous mapping. Cannot map '" +	newHandlerMethod.getBean() + "' method \n" +
@@ -188,13 +187,13 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
                                 handlerMethod.getBean() + "' bean method\n" + handlerMethod + " mapped.");
             }
         }
-        private void addMappingName(String name, HandlerMethod handlerMethod) {
-            List<HandlerMethod> oldList = this.nameLookup.get(name);
+        private void addMappingName(String name, MyHandlerMethod handlerMethod) {
+            List<MyHandlerMethod> oldList = this.nameLookup.get(name);
             if (oldList == null) {
                 oldList = Collections.emptyList();
             }
 
-            for (HandlerMethod current : oldList) {
+            for (MyHandlerMethod current : oldList) {
                 if (handlerMethod.equals(current)) {
                     return;
                 }
@@ -204,7 +203,7 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
                 logger.trace("Mapping name '" + name + "'");
             }
 
-            List<HandlerMethod> newList = new ArrayList<>(oldList.size() + 1);
+            List<MyHandlerMethod> newList = new ArrayList<>(oldList.size() + 1);
             newList.addAll(oldList);
             newList.add(handlerMethod);
             this.nameLookup.put(name, newList);
@@ -216,7 +215,7 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
                 }
             }
         }
-        public Map<T, HandlerMethod> getMappings() {
+        public Map<T, MyHandlerMethod> getMappings() {
             return this.mappingLookup;
         }
 
@@ -229,9 +228,9 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
 
         private final T mapping;
 
-        private final HandlerMethod handlerMethod;
+        private final MyHandlerMethod handlerMethod;
 
-        public Match(T mapping, HandlerMethod handlerMethod) {
+        public Match(T mapping, MyHandlerMethod handlerMethod) {
             this.mapping = mapping;
             this.handlerMethod = handlerMethod;
         }
@@ -327,15 +326,15 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
         this.mappingRegistry.register(mapping, handler, method);
         System.out.println("ssss");
     }
-    protected HandlerMethod createHandlerMethod(Object handler, Method method) {
-        HandlerMethod handlerMethod;
+    protected MyHandlerMethod createHandlerMethod(Object handler, Method method) {
+        MyHandlerMethod handlerMethod;
         if (handler instanceof String) {
             String beanName = (String) handler;
-            handlerMethod = new HandlerMethod(beanName,
+            handlerMethod = new MyHandlerMethod(beanName,
                     obtainApplicationContext().getAutowireCapableBeanFactory(), method);
         }
         else {
-            handlerMethod = new HandlerMethod(handler, method);
+            handlerMethod = new MyHandlerMethod(handler, method);
         }
         return handlerMethod;
     }
@@ -347,23 +346,20 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
         return this.namingStrategy;
     }
 
-    @Nullable
-    protected CorsConfiguration initCorsConfiguration(Object handler, Method method, T mapping) {
-        return null;
-    }
+
 
     private static class MappingRegistration<T> {
 
         private final T mapping;
 
-        private final HandlerMethod handlerMethod;
+        private final MyHandlerMethod handlerMethod;
 
         private final List<String> directUrls;
 
         @Nullable
         private final String mappingName;
 
-        public MappingRegistration(T mapping, HandlerMethod handlerMethod,
+        public MappingRegistration(T mapping, MyHandlerMethod handlerMethod,
                                    @Nullable List<String> directUrls, @Nullable String mappingName) {
 
             Assert.notNull(mapping, "Mapping must not be null");
@@ -378,7 +374,7 @@ public abstract class MyAbstractHandlerMethodMapping<T> extends MyAbstractHandle
             return this.mapping;
         }
 
-        public HandlerMethod getHandlerMethod() {
+        public MyHandlerMethod getHandlerMethod() {
             return this.handlerMethod;
         }
 

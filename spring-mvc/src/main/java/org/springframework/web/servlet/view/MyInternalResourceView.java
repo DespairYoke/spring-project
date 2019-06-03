@@ -3,7 +3,7 @@ package org.springframework.web.servlet.view;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.WebUtils;
+import org.springframework.web.util.MyWebUtils;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -110,7 +110,7 @@ public class MyInternalResourceView extends MyAbstractUrlBasedView{
     }
 
     protected boolean useInclude(HttpServletRequest request, HttpServletResponse response) {
-        return (this.alwaysInclude || WebUtils.isIncludeRequest(request) || response.isCommitted());
+        return (this.alwaysInclude || MyWebUtils.isIncludeRequest(request) || response.isCommitted());
     }
 
 }

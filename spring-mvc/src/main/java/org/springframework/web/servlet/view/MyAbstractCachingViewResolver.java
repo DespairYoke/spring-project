@@ -1,7 +1,7 @@
 package org.springframework.web.servlet.view;
 
 import org.springframework.lang.Nullable;
-import org.springframework.web.context.support.WebApplicationObjectSupport;
+import org.springframework.web.context.support.MyWebApplicationObjectSupport;
 import org.springframework.web.servlet.MyView;
 import org.springframework.web.servlet.MyViewResolver;
 
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zwd
  * @since 2019-05-11
  **/
-public abstract class MyAbstractCachingViewResolver extends WebApplicationObjectSupport implements MyViewResolver {
+public abstract class MyAbstractCachingViewResolver extends MyWebApplicationObjectSupport implements MyViewResolver {
 
 
     public static final int DEFAULT_CACHE_LIMIT = 1024;

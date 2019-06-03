@@ -1,13 +1,15 @@
 package org.springframework.web.servlet.mvc.method;
 
-import org.springframework.http.HttpMethod;
+import org.springframework.http.MyHttpMethod;
 import org.springframework.lang.Nullable;
 import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
-import org.springframework.web.accept.ContentNegotiationManager;
-import org.springframework.web.bind.annotation.RequestMethod;
+
+import org.springframework.web.accept.MyContentNegotiationManager;
+import org.springframework.web.bind.annotation.MyRequestMethod;
+
 import org.springframework.web.servlet.mvc.condition.*;
-import org.springframework.web.util.UrlPathHelper;
+import org.springframework.web.util.MyUrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -101,7 +103,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
         /**
          * Set the request method conditions.
          */
-        Builder methods(RequestMethod... methods);
+        Builder methods(MyRequestMethod... methods);
 
         /**
          * Set the request param conditions.
@@ -166,7 +168,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
 
         private String[] paths = new String[0];
 
-        private RequestMethod[] methods = new RequestMethod[0];
+        private MyRequestMethod[] methods = new MyRequestMethod[0];
 
         @Nullable
         private String mappingName;
@@ -188,7 +190,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
         }
 
         @Override
-        public DefaultBuilder methods(RequestMethod... methods) {
+        public DefaultBuilder methods(MyRequestMethod... methods) {
             this.methods = methods;
             return this;
         }
@@ -238,7 +240,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
 
         @Override
         public MyRequestMappingInfo build() {
-            ContentNegotiationManager manager = this.options.getContentNegotiationManager();
+            MyContentNegotiationManager manager = this.options.getContentNegotiationManager();
 
             MyPatternsRequestCondition patternsCondition = new MyPatternsRequestCondition(
                     this.paths, this.options.getUrlPathHelper(), this.options.getPathMatcher(),
@@ -260,7 +262,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
     public static class BuilderConfiguration {
 
         @Nullable
-        private UrlPathHelper urlPathHelper;
+        private MyUrlPathHelper urlPathHelper;
 
         @Nullable
         private PathMatcher pathMatcher;
@@ -272,14 +274,14 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
         private boolean registeredSuffixPatternMatch = false;
 
         @Nullable
-        private ContentNegotiationManager contentNegotiationManager;
+        private MyContentNegotiationManager contentNegotiationManager;
 
         /**
          * Set a custom UrlPathHelper to use for the PatternsRequestCondition.
          * <p>By default this is not set.
          * @since 4.2.8
          */
-        public void setUrlPathHelper(@Nullable UrlPathHelper urlPathHelper) {
+        public void setUrlPathHelper(@Nullable MyUrlPathHelper urlPathHelper) {
             this.urlPathHelper = urlPathHelper;
         }
 
@@ -287,7 +289,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
          * Return a custom UrlPathHelper to use for the PatternsRequestCondition, if any.
          */
         @Nullable
-        public UrlPathHelper getUrlPathHelper() {
+        public MyUrlPathHelper getUrlPathHelper() {
             return this.urlPathHelper;
         }
 
@@ -375,7 +377,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
          * Set the ContentNegotiationManager to use for the ProducesRequestCondition.
          * <p>By default this is not set.
          */
-        public void setContentNegotiationManager(ContentNegotiationManager contentNegotiationManager) {
+        public void setContentNegotiationManager(MyContentNegotiationManager contentNegotiationManager) {
             this.contentNegotiationManager = contentNegotiationManager;
         }
 
@@ -384,7 +386,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
          * if any.
          */
         @Nullable
-        public ContentNegotiationManager getContentNegotiationManager() {
+        public MyContentNegotiationManager getContentNegotiationManager() {
             return this.contentNegotiationManager;
         }
     }
@@ -420,7 +422,7 @@ public final class MyRequestMappingInfo implements MyRequestCondition<MyRequestM
     public int compareTo(MyRequestMappingInfo other, HttpServletRequest request) {
         int result;
         // Automatic vs explicit HTTP HEAD mapping
-        if (HttpMethod.HEAD.matches(request.getMethod())) {
+        if (MyHttpMethod.HEAD.matches(request.getMethod())) {
             result = this.methodsCondition.compareTo(other.getMethodsCondition(), request);
             if (result != 0) {
                 return result;

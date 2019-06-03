@@ -2,7 +2,7 @@ package org.springframework.web.servlet.mvc.condition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.http.MediaType;
+import org.springframework.http.MyMediaType;
 
 /**
  * TODO...
@@ -14,7 +14,7 @@ abstract class MyAbstractMediaTypeExpression implements MyMediaTypeExpression, C
 
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private final MediaType mediaType;
+    private final MyMediaType mediaType;
 
     private final boolean isNegated;
 
@@ -26,16 +26,16 @@ abstract class MyAbstractMediaTypeExpression implements MyMediaTypeExpression, C
         else {
             this.isNegated = false;
         }
-        this.mediaType = MediaType.parseMediaType(expression);
+        this.mediaType = MyMediaType.parseMediaType(expression);
     }
 
-    MyAbstractMediaTypeExpression(MediaType mediaType, boolean negated) {
+    MyAbstractMediaTypeExpression(MyMediaType mediaType, boolean negated) {
         this.mediaType = mediaType;
         this.isNegated = negated;
     }
 
     @Override
-    public MediaType getMediaType() {
+    public MyMediaType getMediaType() {
         return this.mediaType;
     }
 
@@ -46,6 +46,6 @@ abstract class MyAbstractMediaTypeExpression implements MyMediaTypeExpression, C
 
     @Override
     public int compareTo(MyAbstractMediaTypeExpression other) {
-        return MediaType.SPECIFICITY_COMPARATOR.compare(this.getMediaType(), other.getMediaType());
+        return MyMediaType.SPECIFICITY_COMPARATOR.compare(this.getMediaType(), other.getMediaType());
     }
 }

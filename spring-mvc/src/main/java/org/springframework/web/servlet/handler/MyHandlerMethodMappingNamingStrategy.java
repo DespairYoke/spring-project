@@ -1,6 +1,6 @@
 package org.springframework.web.servlet.handler;
 
-import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.MyHandlerMethod;
 
 /**
  * TODO...
@@ -11,5 +11,5 @@ import org.springframework.web.method.HandlerMethod;
 @FunctionalInterface
 public interface MyHandlerMethodMappingNamingStrategy<T> {
 
-    String getName(HandlerMethod handlerMethod, T mapping);
+    String getName(MyHandlerMethod handlerMethod, T mapping);
 }

@@ -1,6 +1,6 @@
 package org.springframework.web.servlet.mvc.method;
 
-import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.MyHandlerMethod;
 import org.springframework.web.servlet.handler.MyHandlerMethodMappingNamingStrategy;
 
 /**
@@ -15,7 +15,7 @@ public class MyRequestMappingInfoHandlerMethodMappingNamingStrategy
     public static final String SEPARATOR = "#";
 
     @Override
-    public String getName(HandlerMethod handlerMethod, MyRequestMappingInfo mapping) {
+    public String getName(MyHandlerMethod handlerMethod, MyRequestMappingInfo mapping) {
         if (mapping.getName() != null) {
             return mapping.getName();
         }

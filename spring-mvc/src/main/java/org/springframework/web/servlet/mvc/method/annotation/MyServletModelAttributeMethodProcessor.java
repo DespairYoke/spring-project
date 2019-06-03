@@ -28,27 +28,19 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.DataBinder;
-import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.method.annotation.ModelAttributeMethodProcessor;
+
+import org.springframework.web.bind.MyServletRequestDataBinder;
+import org.springframework.web.bind.MyWebDataBinder;
+import org.springframework.web.bind.support.MyWebDataBinderFactory;
+import org.springframework.web.context.request.MyNativeWebRequest;
+
+
+import org.springframework.web.context.request.MyRequestAttributes;
+import org.springframework.web.method.annotation.MyModelAttributeMethodProcessor;
 import org.springframework.web.servlet.MyHandlerMapping;
 
-/**
- * A Servlet-specific {@link ModelAttributeMethodProcessor} that applies data
- * binding through a WebDataBinder of type {@link ServletRequestDataBinder}.
- *
- * <p>Also adds a fall-back strategy to instantiate the model attribute from a
- * URI template variable or from a request parameter if the name matches the
- * model attribute name and there is an appropriate type conversion strategy.
- *
- * @author Rossen Stoyanchev
- * @author Juergen Hoeller
- * @since 3.1
- */
-public class MyServletModelAttributeMethodProcessor extends ModelAttributeMethodProcessor {
+
+public class MyServletModelAttributeMethodProcessor extends MyModelAttributeMethodProcessor {
 
     /**
      * Class constructor.
@@ -70,7 +62,7 @@ public class MyServletModelAttributeMethodProcessor extends ModelAttributeMethod
      */
     @Override
     protected final Object createAttribute(String attributeName, MethodParameter parameter,
-                                           WebDataBinderFactory binderFactory, NativeWebRequest request) throws Exception {
+                                           MyWebDataBinderFactory binderFactory, MyNativeWebRequest request) throws Exception {
 
         String value = getRequestValueForAttribute(attributeName, request);
         if (value != null) {
@@ -94,7 +86,7 @@ public class MyServletModelAttributeMethodProcessor extends ModelAttributeMethod
      * @return the request value to try to convert, or {@code null} if none
      */
     @Nullable
-    protected String getRequestValueForAttribute(String attributeName, NativeWebRequest request) {
+    protected String getRequestValueForAttribute(String attributeName, MyNativeWebRequest request) {
         Map<String, String> variables = getUriTemplateVariables(request);
         String variableValue = variables.get(attributeName);
         if (StringUtils.hasText(variableValue)) {
@@ -108,9 +100,9 @@ public class MyServletModelAttributeMethodProcessor extends ModelAttributeMethod
     }
 
     @SuppressWarnings("unchecked")
-    protected final Map<String, String> getUriTemplateVariables(NativeWebRequest request) {
+    protected final Map<String, String> getUriTemplateVariables(MyNativeWebRequest request) {
         Map<String, String> variables = (Map<String, String>) request.getAttribute(
-                MyHandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+                MyHandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, MyRequestAttributes.SCOPE_REQUEST);
         return (variables != null ? variables : Collections.emptyMap());
     }
 
@@ -129,7 +121,7 @@ public class MyServletModelAttributeMethodProcessor extends ModelAttributeMethod
      */
     @Nullable
     protected Object createAttributeFromRequestValue(String sourceValue, String attributeName,
-                                                     MethodParameter parameter, WebDataBinderFactory binderFactory, NativeWebRequest request)
+                                                     MethodParameter parameter, MyWebDataBinderFactory binderFactory, MyNativeWebRequest request)
             throws Exception {
 
         DataBinder binder = binderFactory.createBinder(request, null, attributeName);
@@ -144,17 +136,5 @@ public class MyServletModelAttributeMethodProcessor extends ModelAttributeMethod
         return null;
     }
 
-    /**
-     * This implementation downcasts {@link WebDataBinder} to
-     * {@link ServletRequestDataBinder} before binding.
-     * @see ServletRequestDataBinderFactory
-     */
-    @Override
-    protected void bindRequestParameters(WebDataBinder binder, NativeWebRequest request) {
-        ServletRequest servletRequest = request.getNativeRequest(ServletRequest.class);
-        Assert.state(servletRequest != null, "No ServletRequest");
-        ServletRequestDataBinder servletBinder = (ServletRequestDataBinder) binder;
-        servletBinder.bind(servletRequest);
-    }
 
 }

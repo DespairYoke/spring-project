@@ -2,19 +2,22 @@ package org.springframework.web.servlet.mvc.method.annotation;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
-import org.springframework.http.HttpStatus;
+
+import org.springframework.http.MyHttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite;
-import org.springframework.web.method.support.InvocableHandlerMethod;
-import org.springframework.web.method.support.ModelAndViewContainer;
+
+import org.springframework.web.bind.annotation.MyResponseBody;
+import org.springframework.web.context.request.MyServletWebRequest;
+import org.springframework.web.method.MyHandlerMethod;
+
+import org.springframework.web.method.support.MyHandlerMethodReturnValueHandlerComposite;
+import org.springframework.web.method.support.MyInvocableHandlerMethod;
+import org.springframework.web.method.support.MyModelAndViewContainer;
 import org.springframework.web.servlet.MyView;
-import org.springframework.web.util.NestedServletException;
+import org.springframework.web.util.MyNestedServletException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,14 +32,14 @@ import java.util.concurrent.Callable;
  * @author zwd
  * @since 2019-05-09
  **/
-public class MyServletInvocableHandlerMethod extends InvocableHandlerMethod {
+public class MyServletInvocableHandlerMethod extends MyInvocableHandlerMethod {
 
     private static final Method CALLABLE_METHOD = ClassUtils.getMethod(Callable.class, "call");
 
     @Nullable
-    private HandlerMethodReturnValueHandlerComposite returnValueHandlers;
+    private MyHandlerMethodReturnValueHandlerComposite returnValueHandlers;
 
-    public MyServletInvocableHandlerMethod(HandlerMethod handlerMethod) {
+    public MyServletInvocableHandlerMethod(MyHandlerMethod handlerMethod) {
         super(handlerMethod);
     }
 
@@ -45,7 +48,7 @@ public class MyServletInvocableHandlerMethod extends InvocableHandlerMethod {
         super(handler, method);
     }
 
-    public void setHandlerMethodReturnValueHandlers(HandlerMethodReturnValueHandlerComposite returnValueHandlers) {
+    public void setHandlerMethodReturnValueHandlers(MyHandlerMethodReturnValueHandlerComposite returnValueHandlers) {
         this.returnValueHandlers = returnValueHandlers;
     }
 
@@ -63,7 +66,7 @@ public class MyServletInvocableHandlerMethod extends InvocableHandlerMethod {
                     throw (Exception) result;
                 }
                 else if (result instanceof Throwable) {
-                    throw new NestedServletException("Async processing failed", (Throwable) result);
+                    throw new MyNestedServletException("Async processing failed", (Throwable) result);
                 }
                 return result;
             }, CALLABLE_METHOD);
@@ -150,7 +153,7 @@ public class MyServletInvocableHandlerMethod extends InvocableHandlerMethod {
             // Ensure @ResponseBody-style handling for values collected from a reactive type
             // even if actual return type is ResponseEntity<Flux<T>>
             return (super.hasMethodAnnotation(annotationType) ||
-                    (annotationType == ResponseBody.class &&
+                    (annotationType == MyResponseBody.class &&
                             this.returnValue instanceof MyReactiveTypeHandler.CollectedValuesList));
         }
 
@@ -161,8 +164,8 @@ public class MyServletInvocableHandlerMethod extends InvocableHandlerMethod {
     }
 
 
-    private void setResponseStatus(ServletWebRequest webRequest) throws IOException {
-        HttpStatus status = getResponseStatus();
+    private void setResponseStatus(MyServletWebRequest webRequest) throws IOException {
+        MyHttpStatus status = getResponseStatus();
         if (status == null) {
             return;
         }
@@ -182,7 +185,7 @@ public class MyServletInvocableHandlerMethod extends InvocableHandlerMethod {
         webRequest.getRequest().setAttribute(MyView.RESPONSE_STATUS_ATTRIBUTE, status);
     }
 
-    public void invokeAndHandle(ServletWebRequest webRequest, ModelAndViewContainer mavContainer,
+    public void invokeAndHandle(MyServletWebRequest webRequest, MyModelAndViewContainer mavContainer,
                                 Object... providedArgs) throws Exception {
 
         Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
@@ -213,7 +216,7 @@ public class MyServletInvocableHandlerMethod extends InvocableHandlerMethod {
         }
     }
 
-    private boolean isRequestNotModified(ServletWebRequest webRequest) {
+    private boolean isRequestNotModified(MyServletWebRequest webRequest) {
         return webRequest.isNotModified();
     }
 

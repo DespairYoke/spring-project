@@ -1,10 +1,12 @@
 package org.springframework.web.servlet.mvc.condition;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+
+import org.springframework.http.MyHttpHeaders;
+import org.springframework.http.MyHttpMethod;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.bind.annotation.MyRequestMethod;
+
+import org.springframework.web.cors.MyCorsUtils;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServletRequest;
@@ -19,37 +21,37 @@ import java.util.*;
 public class MyRequestMethodsRequestCondition  extends MyAbstractRequestCondition<MyRequestMethodsRequestCondition>{
 
     private static final MyRequestMethodsRequestCondition GET_CONDITION =
-            new MyRequestMethodsRequestCondition(RequestMethod.GET);
+            new MyRequestMethodsRequestCondition(MyRequestMethod.GET);
 
-    private final Set<RequestMethod> methods;
+    private final Set<MyRequestMethod> methods;
 
-    public MyRequestMethodsRequestCondition(RequestMethod... requestMethods) {
+    public MyRequestMethodsRequestCondition(MyRequestMethod... requestMethods) {
         this(Arrays.asList(requestMethods));
     }
 
-    private MyRequestMethodsRequestCondition(Collection<RequestMethod> requestMethods) {
+    private MyRequestMethodsRequestCondition(Collection<MyRequestMethod> requestMethods) {
         this.methods = Collections.unmodifiableSet(new LinkedHashSet<>(requestMethods));
     }
 
     @Override
-    protected Collection<RequestMethod> getContent() {
+    protected Collection<MyRequestMethod> getContent() {
         return this.methods;
     }
     @Override
     public MyRequestMethodsRequestCondition combine(MyRequestMethodsRequestCondition other) {
-        Set<RequestMethod> set = new LinkedHashSet<>(this.methods);
+        Set<MyRequestMethod> set = new LinkedHashSet<>(this.methods);
         set.addAll(other.methods);
         return new MyRequestMethodsRequestCondition(set);
     }
 
     @Override
     public MyRequestMethodsRequestCondition getMatchingCondition(HttpServletRequest request) {
-        if (CorsUtils.isPreFlightRequest(request)) {
+        if (MyCorsUtils.isPreFlightRequest(request)) {
             return matchPreFlight(request);
         }
 
         if (getMethods().isEmpty()) {
-            if (RequestMethod.OPTIONS.name().equals(request.getMethod()) &&
+            if (MyRequestMethod.OPTIONS.name().equals(request.getMethod()) &&
                     !DispatcherType.ERROR.equals(request.getDispatcherType())) {
 
                 return null; // No implicit match for OPTIONS (we handle it)
@@ -65,20 +67,20 @@ public class MyRequestMethodsRequestCondition  extends MyAbstractRequestConditio
         if (getMethods().isEmpty()) {
             return this;
         }
-        String expectedMethod = request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD);
+        String expectedMethod = request.getHeader(MyHttpHeaders.ACCESS_CONTROL_REQUEST_METHOD);
         return matchRequestMethod(expectedMethod);
     }
 
     @Nullable
     private MyRequestMethodsRequestCondition matchRequestMethod(String httpMethodValue) {
-        HttpMethod httpMethod = HttpMethod.resolve(httpMethodValue);
+        MyHttpMethod httpMethod = MyHttpMethod.resolve(httpMethodValue);
         if (httpMethod != null) {
-            for (RequestMethod method : getMethods()) {
+            for (MyRequestMethod method : getMethods()) {
                 if (httpMethod.matches(method.name())) {
                     return new MyRequestMethodsRequestCondition(method);
                 }
             }
-            if (httpMethod == HttpMethod.HEAD && getMethods().contains(RequestMethod.GET)) {
+            if (httpMethod == MyHttpMethod.HEAD && getMethods().contains(MyRequestMethod.GET)) {
                 return GET_CONDITION;
             }
         }
@@ -89,7 +91,7 @@ public class MyRequestMethodsRequestCondition  extends MyAbstractRequestConditio
     public int compareTo(MyRequestMethodsRequestCondition other, HttpServletRequest request) {
         return 0;
     }
-    public Set<RequestMethod> getMethods() {
+    public Set<MyRequestMethod> getMethods() {
         return this.methods;
     }
 }

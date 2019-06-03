@@ -3,7 +3,7 @@ package org.springframework.web.servlet.handler;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.PathMatcher;
-import org.springframework.web.context.request.WebRequestInterceptor;
+import org.springframework.web.context.request.MyWebRequestInterceptor;
 import org.springframework.web.servlet.MyHandlerInterceptor;
 
 /**
@@ -31,7 +31,7 @@ public final class MyMappedInterceptor implements MyHandlerInterceptor {
     }
 
     public MyMappedInterceptor(@Nullable String[] includePatterns, @Nullable String[] excludePatterns,
-                             WebRequestInterceptor interceptor) {
+                             MyWebRequestInterceptor interceptor) {
 
         this(includePatterns, excludePatterns, new MyWebRequestHandlerInterceptorAdapter(interceptor));
     }
@@ -46,7 +46,7 @@ public final class MyMappedInterceptor implements MyHandlerInterceptor {
     }
 
 
-    public MyMappedInterceptor(@Nullable String[] includePatterns, WebRequestInterceptor interceptor) {
+    public MyMappedInterceptor(@Nullable String[] includePatterns, MyWebRequestInterceptor interceptor) {
         this(includePatterns, null, interceptor);
     }
 

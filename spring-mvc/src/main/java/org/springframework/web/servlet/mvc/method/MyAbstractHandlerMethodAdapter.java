@@ -2,7 +2,7 @@ package org.springframework.web.servlet.mvc.method;
 
 import org.springframework.core.Ordered;
 import org.springframework.lang.Nullable;
-import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.MyHandlerMethod;
 import org.springframework.web.servlet.MyHandlerAdapter;
 import org.springframework.web.servlet.MyModelAndView;
 import org.springframework.web.servlet.support.MyWebContentGenerator;
@@ -23,10 +23,10 @@ public abstract class MyAbstractHandlerMethodAdapter extends MyWebContentGenerat
     public final MyModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
-        return handleInternal(request, response, (HandlerMethod) handler);
+        return handleInternal(request, response, (MyHandlerMethod) handler);
     }
 
     @Nullable
     protected abstract MyModelAndView handleInternal(HttpServletRequest request,
-                                                   HttpServletResponse response, HandlerMethod handlerMethod) throws Exception;
+                                                   HttpServletResponse response, MyHandlerMethod handlerMethod) throws Exception;
 }

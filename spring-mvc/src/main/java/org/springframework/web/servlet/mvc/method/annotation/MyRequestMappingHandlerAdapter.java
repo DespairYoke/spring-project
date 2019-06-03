@@ -2,7 +2,7 @@ package org.springframework.web.servlet.mvc.method.annotation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeansException;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -13,24 +13,28 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
-import org.springframework.http.converter.xml.SourceHttpMessageConverter;
+
+import org.springframework.http.converter.MyByteArrayHttpMessageConverter;
+import org.springframework.http.converter.MyHttpMessageConverter;
+import org.springframework.http.converter.MyStringHttpMessageConverter;
+
+import org.springframework.http.converter.support.MyAllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.MySourceHttpMessageConverter;
+
 import org.springframework.lang.Nullable;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.MyInitBinder;
+import org.springframework.web.bind.annotation.MyModelAttribute;
+import org.springframework.web.bind.annotation.MyRequestMapping;
+
 import org.springframework.web.bind.support.*;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.MyNativeWebRequest;
+import org.springframework.web.context.request.MyServletWebRequest;
+
 import org.springframework.web.context.request.async.*;
-import org.springframework.web.method.ControllerAdviceBean;
-import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.MyControllerAdviceBean;
+import org.springframework.web.method.MyHandlerMethod;
 import org.springframework.web.method.annotation.*;
 import org.springframework.web.method.support.*;
 import org.springframework.web.servlet.MyModelAndView;
@@ -41,7 +45,6 @@ import org.springframework.web.servlet.support.MyRequestContextUtils;
 import org.springframework.util.ReflectionUtils.MethodFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,55 +65,55 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
 
     private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
 
-    private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
+    private final Map<MyControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
 
     @Nullable
-    private HandlerMethodArgumentResolverComposite argumentResolvers;
+    private MyHandlerMethodArgumentResolverComposite argumentResolvers;
 
     @Nullable
-    private HandlerMethodArgumentResolverComposite initBinderArgumentResolvers;
+    private MyHandlerMethodArgumentResolverComposite initBinderArgumentResolvers;
 
-    private CallableProcessingInterceptor[] callableInterceptors = new CallableProcessingInterceptor[0];
+    private MyCallableProcessingInterceptor[] callableInterceptors = new MyCallableProcessingInterceptor[0];
     @Nullable
-    private WebBindingInitializer webBindingInitializer;
+    private MyWebBindingInitializer webBindingInitializer;
 
     private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     @Nullable
-    private HandlerMethodReturnValueHandlerComposite returnValueHandlers;
+    private MyHandlerMethodReturnValueHandlerComposite returnValueHandlers;
 
     protected static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
     private boolean ignoreDefaultModelOnRedirect = false;
 
-    private DeferredResultProcessingInterceptor[] deferredResultInterceptors = new DeferredResultProcessingInterceptor[0];
+    private MyDeferredResultProcessingInterceptor[] deferredResultInterceptors = new MyDeferredResultProcessingInterceptor[0];
 
     private AsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor("MvcAsync");
 
-    private List<HttpMessageConverter<?>> messageConverters;
+    private List<MyHttpMessageConverter<?>> messageConverters;
 
     @Nullable
     private Long asyncRequestTimeout;
 
     private int cacheSecondsForSessionAttributeHandlers = 0;
 
-    private SessionAttributeStore sessionAttributeStore = new DefaultSessionAttributeStore();
+    private MySessionAttributeStore sessionAttributeStore = new MyDefaultSessionAttributeStore();
 
-    private final Map<Class<?>, SessionAttributesHandler> sessionAttributesHandlerCache = new ConcurrentHashMap<>(64);
+    private final Map<Class<?>, MySessionAttributesHandler> sessionAttributesHandlerCache = new ConcurrentHashMap<>(64);
 
     private final Map<Class<?>, Set<Method>> modelAttributeCache = new ConcurrentHashMap<>(64);
 
-    private final Map<ControllerAdviceBean, Set<Method>> modelAttributeAdviceCache = new LinkedHashMap<>();
+    private final Map<MyControllerAdviceBean, Set<Method>> modelAttributeAdviceCache = new LinkedHashMap<>();
 
 
     public MyRequestMappingHandlerAdapter() {
-        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
+        MyStringHttpMessageConverter stringHttpMessageConverter = new MyStringHttpMessageConverter();
         stringHttpMessageConverter.setWriteAcceptCharset(false);  // see SPR-7316
 
         this.messageConverters = new ArrayList<>(4);
-        this.messageConverters.add(new ByteArrayHttpMessageConverter());
+        this.messageConverters.add(new MyByteArrayHttpMessageConverter());
         this.messageConverters.add(stringHttpMessageConverter);
-        this.messageConverters.add(new SourceHttpMessageConverter<>());
-        this.messageConverters.add(new AllEncompassingFormHttpMessageConverter());
+        this.messageConverters.add(new MySourceHttpMessageConverter<>());
+        this.messageConverters.add(new MyAllEncompassingFormHttpMessageConverter());
     }
 
 
@@ -134,7 +137,7 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
 
     @Override
     protected MyModelAndView handleInternal(HttpServletRequest request,
-                                            HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
+                                            HttpServletResponse response, MyHandlerMethod handlerMethod) throws Exception {
 
         MyModelAndView mav;
 
@@ -146,18 +149,18 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
 
 
 
-    protected MyServletInvocableHandlerMethod createInvocableHandlerMethod(HandlerMethod handlerMethod) {
+    protected MyServletInvocableHandlerMethod createInvocableHandlerMethod(MyHandlerMethod handlerMethod) {
         return new MyServletInvocableHandlerMethod(handlerMethod);
     }
-    private ModelFactory getModelFactory(HandlerMethod handlerMethod, WebDataBinderFactory binderFactory) {
-        SessionAttributesHandler sessionAttrHandler = getSessionAttributesHandler(handlerMethod);
+    private MyModelFactory getModelFactory(MyHandlerMethod handlerMethod, MyWebDataBinderFactory binderFactory) {
+        MySessionAttributesHandler sessionAttrHandler = getSessionAttributesHandler(handlerMethod);
         Class<?> handlerType = handlerMethod.getBeanType();
         Set<Method> methods = this.modelAttributeCache.get(handlerType);
         if (methods == null) {
             methods = MethodIntrospector.selectMethods(handlerType, MODEL_ATTRIBUTE_METHODS);
             this.modelAttributeCache.put(handlerType, methods);
         }
-        List<InvocableHandlerMethod> attrMethods = new ArrayList<>();
+        List<MyInvocableHandlerMethod> attrMethods = new ArrayList<>();
         // Global methods first
         this.modelAttributeAdviceCache.forEach((clazz, methodSet) -> {
             if (clazz.isApplicableToBeanType(handlerType)) {
@@ -171,11 +174,11 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
             Object bean = handlerMethod.getBean();
             attrMethods.add(createModelAttributeMethod(binderFactory, bean, method));
         }
-        return new ModelFactory(attrMethods, binderFactory, sessionAttrHandler);
+        return new MyModelFactory(attrMethods, binderFactory, sessionAttrHandler);
     }
 
-    private InvocableHandlerMethod createModelAttributeMethod(WebDataBinderFactory factory, Object bean, Method method) {
-        InvocableHandlerMethod attrMethod = new InvocableHandlerMethod(bean, method);
+    private MyInvocableHandlerMethod createModelAttributeMethod(MyWebDataBinderFactory factory, Object bean, Method method) {
+        MyInvocableHandlerMethod attrMethod = new MyInvocableHandlerMethod(bean, method);
         if (this.argumentResolvers != null) {
             attrMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
         }
@@ -184,14 +187,14 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
         return attrMethod;
     }
 
-    private SessionAttributesHandler getSessionAttributesHandler(HandlerMethod handlerMethod) {
+    private MySessionAttributesHandler getSessionAttributesHandler(MyHandlerMethod handlerMethod) {
         Class<?> handlerType = handlerMethod.getBeanType();
-        SessionAttributesHandler sessionAttrHandler = this.sessionAttributesHandlerCache.get(handlerType);
+        MySessionAttributesHandler sessionAttrHandler = this.sessionAttributesHandlerCache.get(handlerType);
         if (sessionAttrHandler == null) {
             synchronized (this.sessionAttributesHandlerCache) {
                 sessionAttrHandler = this.sessionAttributesHandlerCache.get(handlerType);
                 if (sessionAttrHandler == null) {
-                    sessionAttrHandler = new SessionAttributesHandler(handlerType, sessionAttributeStore);
+                    sessionAttrHandler = new MySessionAttributesHandler(handlerType, sessionAttributeStore);
                     this.sessionAttributesHandlerCache.put(handlerType, sessionAttrHandler);
                 }
             }
@@ -200,14 +203,14 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
     }
 
     protected MyModelAndView invokeHandlerMethod(HttpServletRequest request,
-                                               HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
+                                               HttpServletResponse response, MyHandlerMethod handlerMethod) throws Exception {
 
-        ServletWebRequest webRequest = new ServletWebRequest(request, response);
+        MyServletWebRequest webRequest = new MyServletWebRequest(request, response);
         try {
             //@InitBinder处理
-            WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+            MyWebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
             //@ModelAttribute处理
-            ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
+            MyModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
             MyServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
             if (this.argumentResolvers != null) {
@@ -219,7 +222,7 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
             invocableMethod.setDataBinderFactory(binderFactory);
             invocableMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
 
-            ModelAndViewContainer mavContainer = new ModelAndViewContainer();
+            MyModelAndViewContainer mavContainer = new MyModelAndViewContainer();
             mavContainer.addAllAttributes(MyRequestContextUtils.getInputFlashMap(request));
 //            modelFactory.initModel(webRequest, mavContainer, invocableMethod);
             mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
@@ -236,8 +239,8 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
     }
 
     @Nullable
-    private MyModelAndView getModelAndView(ModelAndViewContainer mavContainer,
-                                         ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
+    private MyModelAndView getModelAndView(MyModelAndViewContainer mavContainer,
+                                           MyModelFactory modelFactory, MyNativeWebRequest webRequest) throws Exception {
 
         modelFactory.updateModel(webRequest, mavContainer);
         if (mavContainer.isRequestHandled()) {
@@ -258,14 +261,14 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
         return mav;
     }
 
-    private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
+    private MyWebDataBinderFactory getDataBinderFactory(MyHandlerMethod handlerMethod) throws Exception {
         Class<?> handlerType = handlerMethod.getBeanType();
         Set<Method> methods = this.initBinderCache.get(handlerType);
         if (methods == null) {
             methods = MethodIntrospector.selectMethods(handlerType, INIT_BINDER_METHODS);
             this.initBinderCache.put(handlerType, methods);
         }
-        List<InvocableHandlerMethod> initBinderMethods = new ArrayList<>();
+        List<MyInvocableHandlerMethod> initBinderMethods = new ArrayList<>();
         // Global methods first
         this.initBinderAdviceCache.forEach((clazz, methodSet) -> {
             if (clazz.isApplicableToBeanType(handlerType)) {
@@ -284,24 +287,24 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
 
 
 
-    private InvocableHandlerMethod createInitBinderMethod(Object bean, Method method) {
-        InvocableHandlerMethod binderMethod = new InvocableHandlerMethod(bean, method);
+    private MyInvocableHandlerMethod createInitBinderMethod(Object bean, Method method) {
+        MyInvocableHandlerMethod binderMethod = new MyInvocableHandlerMethod(bean, method);
         if (this.initBinderArgumentResolvers != null) {
             binderMethod.setHandlerMethodArgumentResolvers(this.initBinderArgumentResolvers);
         }
-        binderMethod.setDataBinderFactory(new DefaultDataBinderFactory(this.webBindingInitializer));
+        binderMethod.setDataBinderFactory(new MyDefaultDataBinderFactory(this.webBindingInitializer));
         binderMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
         return binderMethod;
     }
 
-    protected InitBinderDataBinderFactory createDataBinderFactory(List<InvocableHandlerMethod> binderMethods)
+    protected MyInitBinderDataBinderFactory createDataBinderFactory(List<MyInvocableHandlerMethod> binderMethods)
             throws Exception {
 
         return new MyServletRequestDataBinderFactory(binderMethods, getWebBindingInitializer());
     }
 
     @Nullable
-    public WebBindingInitializer getWebBindingInitializer() {
+    public MyWebBindingInitializer getWebBindingInitializer() {
         return this.webBindingInitializer;
     }
     @Override
@@ -310,26 +313,26 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
 
         if (this.argumentResolvers == null) {
             //为后续参数处理做准备
-            List<HandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
-            this.argumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
+            List<MyHandlerMethodArgumentResolver> resolvers = getDefaultArgumentResolvers();
+            this.argumentResolvers = new MyHandlerMethodArgumentResolverComposite().addResolvers(resolvers);
         }
         if (this.initBinderArgumentResolvers == null) {
-            List<HandlerMethodArgumentResolver> resolvers = getDefaultInitBinderArgumentResolvers();
-            this.initBinderArgumentResolvers = new HandlerMethodArgumentResolverComposite().addResolvers(resolvers);
+            List<MyHandlerMethodArgumentResolver> resolvers = getDefaultInitBinderArgumentResolvers();
+            this.initBinderArgumentResolvers = new MyHandlerMethodArgumentResolverComposite().addResolvers(resolvers);
         }
         if (this.returnValueHandlers == null) {
-            List<HandlerMethodReturnValueHandler> handlers = getDefaultReturnValueHandlers();
-            this.returnValueHandlers = new HandlerMethodReturnValueHandlerComposite().addHandlers(handlers);
+            List<MyHandlerMethodReturnValueHandler> handlers = getDefaultReturnValueHandlers();
+            this.returnValueHandlers = new MyHandlerMethodReturnValueHandlerComposite().addHandlers(handlers);
         }
     }
 
 
-    private List<HandlerMethodArgumentResolver> getDefaultArgumentResolvers() {
-        List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
+    private List<MyHandlerMethodArgumentResolver> getDefaultArgumentResolvers() {
+        List<MyHandlerMethodArgumentResolver> resolvers = new ArrayList<>();
 
         // Annotation-based argument resolution
-        resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), false));
-        resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), true));
+        resolvers.add(new MyRequestParamMethodArgumentResolver(getBeanFactory(), false));
+        resolvers.add(new MyRequestParamMethodArgumentResolver(getBeanFactory(), true));
         resolvers.add(new MyServletModelAttributeMethodProcessor(false));
         resolvers.add(new MyServletModelAttributeMethodProcessor(true));
         return resolvers;
@@ -343,7 +346,7 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
      * Return the list of argument resolvers to use for {@code @InitBinder}
      * methods including built-in and custom resolvers.
      */
-    private List<HandlerMethodArgumentResolver> getDefaultInitBinderArgumentResolvers() {
+    private List<MyHandlerMethodArgumentResolver> getDefaultInitBinderArgumentResolvers() {
         return null;
     }
 
@@ -351,9 +354,9 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
      * Return the list of return value handlers to use including built-in and
      * custom handlers provided via {@link #}.
      */
-    private List<HandlerMethodReturnValueHandler> getDefaultReturnValueHandlers() {
+    private List<MyHandlerMethodReturnValueHandler> getDefaultReturnValueHandlers() {
 
-        List<HandlerMethodReturnValueHandler> handlers = new ArrayList<>();
+        List<MyHandlerMethodReturnValueHandler> handlers = new ArrayList<>();
 
         handlers.add(new MyModelAndViewMethodReturnValueHandler());
 
@@ -364,13 +367,13 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
     }
 
     public static final MethodFilter INIT_BINDER_METHODS = method ->
-            AnnotationUtils.findAnnotation(method, InitBinder.class) != null;
+            AnnotationUtils.findAnnotation(method, MyInitBinder.class) != null;
 
     public static final MethodFilter MODEL_ATTRIBUTE_METHODS = method ->
-            ((AnnotationUtils.findAnnotation(method, RequestMapping.class) == null) &&
-                    (AnnotationUtils.findAnnotation(method, ModelAttribute.class) != null));
+            ((AnnotationUtils.findAnnotation(method, MyRequestMapping.class) == null) &&
+                    (AnnotationUtils.findAnnotation(method, MyModelAttribute.class) != null));
 
-    public void setWebBindingInitializer(@Nullable WebBindingInitializer webBindingInitializer) {
+    public void setWebBindingInitializer(@Nullable MyWebBindingInitializer webBindingInitializer) {
 
 
     }

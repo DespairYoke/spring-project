@@ -11,9 +11,9 @@ import org.springframework.core.io.ResourceEditor;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.context.support.ServletContextResourceLoader;
-import org.springframework.web.context.support.StandardServletEnvironment;
+import org.springframework.web.context.support.MyServletContextResourceLoader;
+import org.springframework.web.context.support.MyStandardServletEnvironment;
+
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -53,7 +53,7 @@ public abstract class MyHttpServletBean extends HttpServlet implements Environme
          */
         if (!pvs.isEmpty()) {
             BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
-            ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
+            ResourceLoader resourceLoader = new MyServletContextResourceLoader(getServletContext());
             bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
             initBeanWrapper(bw);
             bw.setPropertyValues(pvs, true);
@@ -73,7 +73,7 @@ public abstract class MyHttpServletBean extends HttpServlet implements Environme
     }
 
     protected ConfigurableEnvironment createEnvironment() {
-        return new StandardServletEnvironment();
+        return new MyStandardServletEnvironment();
     }
 
 

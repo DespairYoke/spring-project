@@ -5,12 +5,13 @@ import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.MyWebApplicationContext;
+
 import org.springframework.web.servlet.MyDispatcherServlet;
 import org.springframework.web.servlet.MyLocaleContextResolver;
 import org.springframework.web.servlet.MyLocaleResolver;
-import org.springframework.web.util.UrlPathHelper;
-import org.springframework.web.util.WebUtils;
+import org.springframework.web.util.MyUrlPathHelper;
+import org.springframework.web.util.MyWebUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -44,12 +45,12 @@ public class MyRequestContext {
     @Nullable
     private Map<String, Object> model;
 
-    private WebApplicationContext webApplicationContext;
+    private MyWebApplicationContext webApplicationContext;
 
     @Nullable
     private Boolean responseEncodedHtmlEscape;
 
-    private UrlPathHelper urlPathHelper;
+    private MyUrlPathHelper urlPathHelper;
 
     @Nullable
     private MyRequestDataValueProcessor requestDataValueProcessor;
@@ -100,7 +101,7 @@ public class MyRequestContext {
 
         // Fetch WebApplicationContext, either from DispatcherServlet or the root context.
         // ServletContext needs to be specified to be able to fall back to the root context!
-        WebApplicationContext wac = (WebApplicationContext) request.getAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+        MyWebApplicationContext wac = (MyWebApplicationContext) request.getAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE);
         if (wac == null) {
             wac = MyRequestContextUtils.findWebApplicationContext(request, servletContext);
             if (wac == null) {
@@ -132,14 +133,14 @@ public class MyRequestContext {
 
         // Determine default HTML escape setting from the "defaultHtmlEscape"
         // context-param in web.xml, if any.
-        this.defaultHtmlEscape = WebUtils.getDefaultHtmlEscape(this.webApplicationContext.getServletContext());
+        this.defaultHtmlEscape = MyWebUtils.getDefaultHtmlEscape(this.webApplicationContext.getServletContext());
 
         // Determine response-encoded HTML escape setting from the "responseEncodedHtmlEscape"
         // context-param in web.xml, if any.
         this.responseEncodedHtmlEscape =
-                WebUtils.getResponseEncodedHtmlEscape(this.webApplicationContext.getServletContext());
+                MyWebUtils.getResponseEncodedHtmlEscape(this.webApplicationContext.getServletContext());
 
-        this.urlPathHelper = new UrlPathHelper();
+        this.urlPathHelper = new MyUrlPathHelper();
 
         if (this.webApplicationContext.containsBean(MyRequestContextUtils.REQUEST_DATA_VALUE_PROCESSOR_BEAN_NAME)) {
             this.requestDataValueProcessor = this.webApplicationContext.getBean(

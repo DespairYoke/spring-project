@@ -3,9 +3,11 @@ package org.springframework.web.servlet.view;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.ContextExposingHttpServletRequest;
-import org.springframework.web.context.support.WebApplicationObjectSupport;
+import org.springframework.web.context.MyContextExposingHttpServletRequest;
+import org.springframework.web.context.MyWebApplicationContext;
+
+import org.springframework.web.context.support.MyWebApplicationObjectSupport;
+
 import org.springframework.web.servlet.MyView;
 import org.springframework.web.servlet.support.MyRequestContext;
 
@@ -19,7 +21,7 @@ import java.util.*;
  * @author zwd
  * @since 2019-05-13
  **/
-public abstract class MyAbstractView extends WebApplicationObjectSupport implements MyView, BeanNameAware {
+public abstract class MyAbstractView extends MyWebApplicationObjectSupport implements MyView, BeanNameAware {
 
     public static final String DEFAULT_CONTENT_TYPE = "text/html;charset=ISO-8859-1";
 
@@ -83,9 +85,9 @@ public abstract class MyAbstractView extends WebApplicationObjectSupport impleme
 
     protected HttpServletRequest getRequestToExpose(HttpServletRequest originalRequest) {
         if (this.exposeContextBeansAsAttributes || this.exposedContextBeanNames != null) {
-            WebApplicationContext wac = getWebApplicationContext();
+            MyWebApplicationContext wac = getWebApplicationContext();
             Assert.state(wac != null, "No WebApplicationContext");
-            return new ContextExposingHttpServletRequest(originalRequest, wac, this.exposedContextBeanNames);
+            return new MyContextExposingHttpServletRequest(originalRequest, wac, this.exposedContextBeanNames);
         }
         return originalRequest;
     }

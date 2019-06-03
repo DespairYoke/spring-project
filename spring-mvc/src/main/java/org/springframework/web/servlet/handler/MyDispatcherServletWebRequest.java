@@ -1,6 +1,6 @@
 package org.springframework.web.servlet.handler;
 
-import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.MyServletWebRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author zwd
  * @since 2019-04-28
  **/
-public class MyDispatcherServletWebRequest extends ServletWebRequest {
+public class MyDispatcherServletWebRequest extends MyServletWebRequest {
 
     public MyDispatcherServletWebRequest(HttpServletRequest request) {
         super(request);

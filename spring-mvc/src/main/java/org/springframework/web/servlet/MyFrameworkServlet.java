@@ -13,27 +13,32 @@ import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.http.HttpMethod;
+
+import org.springframework.http.MyHttpMethod;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.ConfigurableWebApplicationContext;
-import org.springframework.web.context.ConfigurableWebEnvironment;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.async.CallableProcessingInterceptor;
-import org.springframework.web.context.request.async.WebAsyncManager;
-import org.springframework.web.context.request.async.WebAsyncUtils;
-import org.springframework.web.context.support.ServletRequestHandledEvent;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.support.XmlWebApplicationContext;
-import org.springframework.web.util.NestedServletException;
-import org.springframework.web.util.WebUtils;
+
+import org.springframework.web.context.MyConfigurableWebApplicationContext;
+import org.springframework.web.context.MyConfigurableWebEnvironment;
+import org.springframework.web.context.MyContextLoader;
+import org.springframework.web.context.MyWebApplicationContext;
+import org.springframework.web.context.request.MyNativeWebRequest;
+import org.springframework.web.context.request.MyRequestAttributes;
+import org.springframework.web.context.request.MyRequestContextHolder;
+import org.springframework.web.context.request.MyServletRequestAttributes;
+import org.springframework.web.context.request.async.MyCallableProcessingInterceptor;
+import org.springframework.web.context.request.async.MyWebAsyncManager;
+import org.springframework.web.context.request.async.MyWebAsyncUtils;
+
+import org.springframework.web.context.support.MyServletRequestHandledEvent;
+import org.springframework.web.context.support.MyWebApplicationContextUtils;
+import org.springframework.web.context.support.MyXmlWebApplicationContext;
+
+import org.springframework.web.util.MyNestedServletException;
+import org.springframework.web.util.MyWebUtils;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -53,11 +58,11 @@ import java.util.concurrent.Callable;
 public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
     @Nullable
-    private WebApplicationContext webApplicationContext;
+    private MyWebApplicationContext webApplicationContext;
 
     private Log logger = LogFactory.getLog(getClass());
 
-    public static final Class<?> DEFAULT_CONTEXT_CLASS = XmlWebApplicationContext.class;
+    public static final Class<?> DEFAULT_CONTEXT_CLASS = MyXmlWebApplicationContext.class;
 
     private Class<?> contextClass = DEFAULT_CONTEXT_CLASS;
 
@@ -113,73 +118,34 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     }
 
 
-    protected WebApplicationContext initWebApplicationContext() {
-        WebApplicationContext rootContext =
-                WebApplicationContextUtils.getWebApplicationContext(getServletContext()); //null
-        WebApplicationContext wac = null;
+    protected MyWebApplicationContext initWebApplicationContext() {
+        MyWebApplicationContext rootContext =
+                MyWebApplicationContextUtils.getWebApplicationContext(getServletContext()); //null
+        MyWebApplicationContext wac = null;
 
-//        if (this.webApplicationContext != null) {
-//            // A context instance was injected at construction time -> use it
-//            wac = this.webApplicationContext;
-//            if (wac instanceof ConfigurableWebApplicationContext) {
-//                ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) wac;
-//                if (!cwac.isActive()) {
-//                    // The context has not yet been refreshed -> provide services such as
-//                    // setting the parent context, setting the application context id, etc
-//                    if (cwac.getParent() == null) {
-//                        // The context instance was injected without an explicit parent -> set
-//                        // the root application context (if any; may be null) as the parent
-//                        cwac.setParent(rootContext);
-//                    }
-//                    configureAndRefreshWebApplicationContext(cwac);
-//                }
-//            }
-//        }
-//        if (wac == null) {
-//            // No context instance was injected at construction time -> see if one
-//            // has been registered in the servlet context. If one exists, it is assumed
-//            // that the parent context (if any) has already been set and that the
-//            // user has performed any initialization such as setting the context id
-//            wac = findWebApplicationContext();
-//        }
+
         if (wac == null) {
             // No context instance is defined for this servlet -> create a local one
             wac = createWebApplicationContext(rootContext);
         }
 
-//        if (!this.refreshEventReceived) {
-//            // Either the context is not a ConfigurableApplicationContext with refresh
-//            // support or the context injected at construction time had already been
-//            // refreshed -> trigger initial onRefresh manually here.
-//            onRefresh(wac);
-//        }
-//
-//        if (this.publishContext) {
-//            // Publish the context as a servlet context attribute.
-//            String attrName = getServletContextAttributeName();
-//            getServletContext().setAttribute(attrName, wac);
-//            if (this.logger.isDebugEnabled()) {
-//                this.logger.debug("Published WebApplicationContext of servlet '" + getServletName() +
-//                        "' as ServletContext attribute with name [" + attrName + "]");
-//            }
-//        }
 
         return wac;
     }
 
 
-    protected WebApplicationContext createWebApplicationContext(@Nullable WebApplicationContext parent) {
+    protected MyWebApplicationContext createWebApplicationContext(@Nullable MyWebApplicationContext parent) {
         return createWebApplicationContext((ApplicationContext) parent);
     }
 
-    protected WebApplicationContext createWebApplicationContext(@Nullable ApplicationContext parent) {
+    protected MyWebApplicationContext createWebApplicationContext(@Nullable ApplicationContext parent) {
         /**
          * 获取加载方式，默认为{@link XmlWebApplicationContext}
          */
         Class<?> contextClass = getContextClass();
 
-        ConfigurableWebApplicationContext wac =
-                (ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
+        MyConfigurableWebApplicationContext wac =
+                (MyConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 
         /**
          * 获取环境 {@link StandardEnvironment}
@@ -204,7 +170,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
         return this.contextConfigLocation;
     }
 
-    protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac) {
+    protected void configureAndRefreshWebApplicationContext(MyConfigurableWebApplicationContext wac) {
         if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
             // The application context id is still set to its original default value
             // -> assign a more useful id based on available information
@@ -213,7 +179,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
             }
             else {
                 // Generate default id...
-                wac.setId(ConfigurableWebApplicationContext.APPLICATION_CONTEXT_ID_PREFIX +
+                wac.setId(MyConfigurableWebApplicationContext.APPLICATION_CONTEXT_ID_PREFIX +
                         ObjectUtils.getDisplayString(getServletContext().getContextPath()) + '/' + getServletName());
             }
         }
@@ -227,8 +193,8 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
         // is refreshed; do it eagerly here to ensure servlet property sources are in place for
         // use in any post-processing or initialization that occurs below prior to #refresh
         ConfigurableEnvironment env = wac.getEnvironment();
-        if (env instanceof ConfigurableWebEnvironment) {
-            ((ConfigurableWebEnvironment) env).initPropertySources(getServletContext(), getServletConfig());
+        if (env instanceof MyConfigurableWebEnvironment) {
+            ((MyConfigurableWebEnvironment) env).initPropertySources(getServletContext(), getServletConfig());
         }
 
         postProcessWebApplicationContext(wac);
@@ -263,12 +229,12 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     protected void initFrameworkServlet() throws ServletException {
     }
 
-    protected void postProcessWebApplicationContext(ConfigurableWebApplicationContext wac) {
+    protected void postProcessWebApplicationContext(MyConfigurableWebApplicationContext wac) {
     }
 
 
     protected void applyInitializers(ConfigurableApplicationContext wac) {
-        String globalClassNames = getServletContext().getInitParameter(ContextLoader.GLOBAL_INITIALIZER_CLASSES_PARAM);
+        String globalClassNames = getServletContext().getInitParameter(MyContextLoader.GLOBAL_INITIALIZER_CLASSES_PARAM);
         if (globalClassNames != null) {
             for (String className : StringUtils.tokenizeToStringArray(globalClassNames, INIT_PARAM_DELIMITERS)) {
                 this.contextInitializers.add(loadInitializer(className, wac));
@@ -325,10 +291,9 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpMethod httpMethod = HttpMethod.resolve(request.getMethod());
+        MyHttpMethod httpMethod = MyHttpMethod.resolve(request.getMethod());
 
-        String method = request.getMethod();
-        if (httpMethod == HttpMethod.PATCH || httpMethod == null) {
+        if (httpMethod == MyHttpMethod.PATCH || httpMethod == null) {
             processRequest(request, response);
         }
         else {
@@ -352,10 +317,10 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
         LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
         LocaleContext localeContext = buildLocaleContext(request);
 
-        RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
-        ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
+        MyRequestAttributes previousAttributes = MyRequestContextHolder.getRequestAttributes();
+        MyServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
-        WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
+        MyWebAsyncManager asyncManager = MyWebAsyncUtils.getAsyncManager(request);
         asyncManager.registerCallableInterceptor(MyFrameworkServlet.class.getName(), new RequestBindingInterceptor());
 
         initContextHolders(request, localeContext, requestAttributes);
@@ -369,7 +334,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
         }
         catch (Throwable ex) {
             failureCause = ex;
-            throw new NestedServletException("Request processing failed", ex);
+            throw new MyNestedServletException("Request processing failed", ex);
         }
 
         finally {
@@ -402,21 +367,21 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     }
 
     @Nullable
-    protected ServletRequestAttributes buildRequestAttributes(HttpServletRequest request,
-                                                              @Nullable HttpServletResponse response, @Nullable RequestAttributes previousAttributes) {
+    protected MyServletRequestAttributes buildRequestAttributes(HttpServletRequest request,
+                                                              @Nullable HttpServletResponse response, @Nullable MyRequestAttributes previousAttributes) {
 
-        if (previousAttributes == null || previousAttributes instanceof ServletRequestAttributes) {
-            return new ServletRequestAttributes(request, response);
+        if (previousAttributes == null || previousAttributes instanceof MyServletRequestAttributes) {
+            return new MyServletRequestAttributes(request, response);
         }
         else {
             return null;  // preserve the pre-bound RequestAttributes instance
         }
     }
 
-    private class RequestBindingInterceptor implements CallableProcessingInterceptor {
+    private class RequestBindingInterceptor implements MyCallableProcessingInterceptor {
 
         @Override
-        public <T> void preProcess(NativeWebRequest webRequest, Callable<T> task) {
+        public <T> void preProcess(MyNativeWebRequest webRequest, Callable<T> task) {
             HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
             if (request != null) {
                 HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
@@ -425,7 +390,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
             }
         }
         @Override
-        public <T> void postProcess(NativeWebRequest webRequest, Callable<T> task, Object concurrentResult) {
+        public <T> void postProcess(MyNativeWebRequest webRequest, Callable<T> task, Object concurrentResult) {
             HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
             if (request != null) {
                 resetContextHolders(request, null, null);
@@ -435,13 +400,13 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
 
     private void initContextHolders(HttpServletRequest request,
-                                    @Nullable LocaleContext localeContext, @Nullable RequestAttributes requestAttributes) {
+                                    @Nullable LocaleContext localeContext, @Nullable MyRequestAttributes requestAttributes) {
 
         if (localeContext != null) {
             LocaleContextHolder.setLocaleContext(localeContext, this.threadContextInheritable);
         }
         if (requestAttributes != null) {
-            RequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
+            MyRequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
         }
         if (logger.isTraceEnabled()) {
             logger.trace("Bound request context to thread: " + request);
@@ -453,10 +418,10 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
 
     private void resetContextHolders(HttpServletRequest request,
-                                     @Nullable LocaleContext prevLocaleContext, @Nullable RequestAttributes previousAttributes) {
+                                     @Nullable LocaleContext prevLocaleContext, @Nullable MyRequestAttributes previousAttributes) {
 
         LocaleContextHolder.setLocaleContext(prevLocaleContext, this.threadContextInheritable);
-        RequestContextHolder.setRequestAttributes(previousAttributes, this.threadContextInheritable);
+        MyRequestContextHolder.setRequestAttributes(previousAttributes, this.threadContextInheritable);
         if (logger.isTraceEnabled()) {
             logger.trace("Cleared thread-bound request context: " + request);
         }
@@ -469,10 +434,10 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
             // Whether or not we succeeded, publish an event.
             long processingTime = System.currentTimeMillis() - startTime;
             this.webApplicationContext.publishEvent(
-                    new ServletRequestHandledEvent(this,
+                    new MyServletRequestHandledEvent(this,
                             request.getRequestURI(), request.getRemoteAddr(),
                             request.getMethod(), getServletConfig().getServletName(),
-                            WebUtils.getSessionId(request), getUsernameForRequest(request),
+                            MyWebUtils.getSessionId(request), getUsernameForRequest(request),
                             processingTime, failureCause, response.getStatus()));
         }
     }
@@ -491,7 +456,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     }
 
     @Nullable
-    public final WebApplicationContext getWebApplicationContext() {
+    public final MyWebApplicationContext getWebApplicationContext() {
         return this.webApplicationContext;
     }
 }

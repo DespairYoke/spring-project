@@ -1,11 +1,12 @@
 package org.springframework.web.servlet.mvc.condition;
 
-import org.springframework.http.InvalidMediaTypeException;
-import org.springframework.http.MediaType;
+
+import org.springframework.http.MyInvalidMediaTypeException;
+import org.springframework.http.MyMediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.cors.MyCorsUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -37,7 +38,7 @@ public class MyConsumesRequestCondition extends MyAbstractRequestCondition<MyCon
             for (String header : headers) {
                 HeaderExpression expr = new HeaderExpression(header);
                 if ("Content-Type".equalsIgnoreCase(expr.name) && expr.value != null) {
-                    for (MediaType mediaType : MediaType.parseMediaTypes(expr.value)) {
+                    for (MyMediaType mediaType : MyMediaType.parseMediaTypes(expr.value)) {
                         result.add(new ConsumeMediaTypeExpression(mediaType, expr.isNegated));
                     }
                 }
@@ -76,20 +77,20 @@ public class MyConsumesRequestCondition extends MyAbstractRequestCondition<MyCon
     @Override
     @Nullable
     public MyConsumesRequestCondition getMatchingCondition(HttpServletRequest request) {
-        if (CorsUtils.isPreFlightRequest(request)) {
+        if (MyCorsUtils.isPreFlightRequest(request)) {
             return PRE_FLIGHT_MATCH;
         }
         if (isEmpty()) {
             return this;
         }
 
-        MediaType contentType;
+        MyMediaType contentType;
         try {
             contentType = (StringUtils.hasLength(request.getContentType()) ?
-                    MediaType.parseMediaType(request.getContentType()) :
-                    MediaType.APPLICATION_OCTET_STREAM);
+                    MyMediaType.parseMediaType(request.getContentType()) :
+                    MyMediaType.APPLICATION_OCTET_STREAM);
         }
-        catch (InvalidMediaTypeException ex) {
+        catch (MyInvalidMediaTypeException ex) {
             return null;
         }
 
@@ -109,18 +110,18 @@ public class MyConsumesRequestCondition extends MyAbstractRequestCondition<MyCon
             super(expression);
         }
 
-        ConsumeMediaTypeExpression(MediaType mediaType, boolean negated) {
+        ConsumeMediaTypeExpression(MyMediaType mediaType, boolean negated) {
             super(mediaType, negated);
         }
 
-        public final boolean match(MediaType contentType) {
+        public final boolean match(MyMediaType contentType) {
             boolean match = getMediaType().includes(contentType);
             return (!isNegated() ? match : !match);
         }
 
         @Override
         public int compareTo(MyAbstractMediaTypeExpression other) {
-            return MediaType.SPECIFICITY_COMPARATOR.compare(this.getMediaType(), other.getMediaType());
+            return MyMediaType.SPECIFICITY_COMPARATOR.compare(this.getMediaType(), other.getMediaType());
         }
 
     }
