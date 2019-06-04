@@ -10,7 +10,6 @@ import org.springframework.lang.Nullable;
  **/
 public interface MyNativeWebRequest extends MyWebRequest{
 
-    Object getNativeRequest();
 
     @Nullable
     <T> T getNativeRequest(@Nullable Class<T> requiredType);

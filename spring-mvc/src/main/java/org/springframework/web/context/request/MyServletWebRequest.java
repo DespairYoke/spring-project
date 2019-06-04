@@ -31,10 +31,6 @@ public class MyServletWebRequest extends MyServletRequestAttributes implements M
         super(request, response);
     }
 
-    @Override
-    public Object getNativeRequest() {
-        return null;
-    }
 
     @Override
     public <T> T getNativeRequest(Class<T> requiredType) {
