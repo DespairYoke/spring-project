@@ -5,10 +5,7 @@ import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.context.MyContextLoader;
 import org.springframework.web.context.MyWebApplicationContext;
-import org.springframework.web.context.support.MyWebApplicationContextUtils;
-
 import org.springframework.web.servlet.*;
 import org.springframework.web.util.MyUriComponents;
 import org.springframework.web.util.MyUriComponentsBuilder;
@@ -62,14 +59,6 @@ public abstract class MyRequestContextUtils {
 
         MyWebApplicationContext webApplicationContext = (MyWebApplicationContext) request.getAttribute(
                 MyDispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE);
-        if (webApplicationContext == null) {
-            if (servletContext != null) {
-                webApplicationContext = MyWebApplicationContextUtils.getWebApplicationContext(servletContext);
-            }
-            if (webApplicationContext == null) {
-                webApplicationContext = MyContextLoader.getCurrentWebApplicationContext();
-            }
-        }
         return webApplicationContext;
     }
 

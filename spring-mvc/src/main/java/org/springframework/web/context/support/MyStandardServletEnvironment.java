@@ -23,6 +23,6 @@ public class MyStandardServletEnvironment  extends StandardEnvironment implement
     @Override
     public void initPropertySources(ServletContext servletContext, ServletConfig servletConfig) {
 
-        MyWebApplicationContextUtils.initServletPropertySources(getPropertySources(), servletContext, servletConfig);
+//        MyWebApplicationContextUtils.initServletPropertySources(getPropertySources(), servletContext, servletConfig);
     }
 }

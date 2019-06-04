@@ -5,8 +5,6 @@ package org.springframework.web.servlet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.io.ClassPathResource;
@@ -21,25 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 
 
 public class MyDispatcherServlet extends MyFrameworkServlet{
 
 
     private Log logger =  LogFactory.getLog(getClass());
-
-
-    private boolean cleanupAfterInclude = true;
-
-    @Nullable
-    private MyLocaleResolver localeResolver;
-
-    @Nullable
-    private MyThemeResolver themeResolver;
-
-    @Nullable
-    private MyFlashMapManager flashMapManager;
 
     @Nullable
     private List<MyHandlerMapping> handlerMappings;
@@ -54,35 +39,26 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
     public static final String LOCALE_RESOLVER_ATTRIBUTE = MyDispatcherServlet.class.getName() + ".LOCALE_RESOLVER";
 
 
-    public static final String THEME_RESOLVER_ATTRIBUTE = MyDispatcherServlet.class.getName() + ".THEME_RESOLVER";
-
     public static final String THEME_SOURCE_ATTRIBUTE = MyDispatcherServlet.class.getName() + ".THEME_SOURCE";
 
-    private static final String DEFAULT_STRATEGIES_PREFIX = "org.springframework.web.servlet";
 
     public static final String WEB_APPLICATION_CONTEXT_ATTRIBUTE = MyDispatcherServlet.class.getName() + ".CONTEXT";
 
     private static final String DEFAULT_STRATEGIES_PATH = "DispatcherServlet.properties";
 
-    public static final String HANDLER_ADAPTER_BEAN_NAME = "myhandlerAdapter";
 
     public static final String INPUT_FLASH_MAP_ATTRIBUTE = MyDispatcherServlet.class.getName() + ".INPUT_FLASH_MAP";
 
     public static final String OUTPUT_FLASH_MAP_ATTRIBUTE = MyDispatcherServlet.class.getName() + ".OUTPUT_FLASH_MAP";
 
-    public static final String VIEW_RESOLVER_BEAN_NAME = "myViewResolver";
 
     public static final String FLASH_MAP_MANAGER_ATTRIBUTE = MyDispatcherServlet.class.getName() + ".FLASH_MAP_MANAGER";
 
-    private boolean detectAllHandlerAdapters = true;
 
     @Nullable
     private List<MyViewResolver> viewResolvers;
 
     static {
-        // Load default strategy implementations from properties file.
-        // This is currently strictly internal and not meant to be customized
-        // by application developers.
         try {
             ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, MyDispatcherServlet.class);
             defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
@@ -177,8 +153,8 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
     protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         request.setAttribute(WEB_APPLICATION_CONTEXT_ATTRIBUTE, getWebApplicationContext());
-        request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
-        request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
+//        request.setAttribute(LOCALE_RESOLVER_ATTRIBUTE, this.localeResolver);
+//        request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
         request.setAttribute(THEME_SOURCE_ATTRIBUTE, getThemeSource());
         doDispatch(request, response);
     }
@@ -212,8 +188,7 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
 
     protected void render(MyModelAndView mv, HttpServletRequest request, HttpServletResponse response) throws Exception {
         //  // 根据请求决定回复消息的 locale
-        Locale locale =
-                (this.localeResolver != null ? this.localeResolver.resolveLocale(request) : request.getLocale());
+        Locale locale = request.getLocale();
         response.setLocale(locale);
 
         MyView view;

@@ -7,7 +7,9 @@ import org.springframework.validation.support.BindingAwareModelMap;
 import org.springframework.web.bind.support.MySessionStatus;
 import org.springframework.web.bind.support.MySimpleSessionStatus;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO...
@@ -29,9 +31,13 @@ public class MyModelAndViewContainer {
 
     private boolean requestHandled = false;
 
+    private final Set<String> bindingDisabled = new HashSet<>(4);
+
     private MyHttpStatus status;
 
     private final MySessionStatus sessionStatus = new MySimpleSessionStatus();
+
+    private final Set<String> noBinding = new HashSet<>(4);
 
     public ModelMap getDefaultModel() {
         return this.defaultModel;
@@ -101,8 +107,20 @@ public class MyModelAndViewContainer {
         return this;
     }
 
+    public boolean isBindingDisabled(String name) {
+        return (this.bindingDisabled.contains(name) || this.noBinding.contains(name));
+    }
+
     public void setIgnoreDefaultModelOnRedirect(boolean ignoreDefaultModelOnRedirect) {
         this.ignoreDefaultModelOnRedirect = ignoreDefaultModelOnRedirect;
     }
 
+    public void setBinding(String attributeName, boolean enabled) {
+        if (!enabled) {
+            this.noBinding.add(attributeName);
+        }
+        else {
+            this.noBinding.remove(attributeName);
+        }
+    }
 }

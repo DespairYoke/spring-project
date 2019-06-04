@@ -1,6 +1,7 @@
 package org.springframework.web.context.request;
 
 import org.springframework.lang.Nullable;
+import org.springframework.web.util.MyWebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,7 +38,7 @@ public class MyServletWebRequest extends MyServletRequestAttributes implements M
 
     @Override
     public <T> T getNativeRequest(Class<T> requiredType) {
-        return null;
+        return MyWebUtils.getNativeRequest(getRequest(), requiredType);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class MyServletWebRequest extends MyServletRequestAttributes implements M
 
     @Override
     public String[] getParameterValues(String paramName) {
-        return new String[0];
+        return getRequest().getParameterValues(paramName);
     }
 
     @Override
@@ -62,5 +63,11 @@ public class MyServletWebRequest extends MyServletRequestAttributes implements M
 
     public boolean isNotModified() {
         return this.notModified;
+    }
+
+    @Override
+    @Nullable
+    public String getHeader(String headerName) {
+        return getRequest().getHeader(headerName);
     }
 }

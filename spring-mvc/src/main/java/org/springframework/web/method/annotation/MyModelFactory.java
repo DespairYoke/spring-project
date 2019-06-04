@@ -48,6 +48,11 @@ public final class MyModelFactory {
         this.sessionAttributesHandler = attributeHandler;
     }
 
+    public static String getNameForParameter(MethodParameter parameter) {
+        MyModelAttribute ann = parameter.getParameterAnnotation(MyModelAttribute.class);
+        String name = (ann != null ? ann.value() : null);
+        return (StringUtils.hasText(name) ? name : Conventions.getVariableNameForParameter(parameter));
+    }
 
     public void updateModel(MyNativeWebRequest request, MyModelAndViewContainer container) throws Exception {
         ModelMap defaultModel = container.getDefaultModel();

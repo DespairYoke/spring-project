@@ -25,6 +25,13 @@ public class MyModelAndView {
     @Nullable
     private MyHttpStatus status;
 
+    public MyModelAndView() {
+    }
+
+    public MyModelAndView(String viewName) {
+        this.view = viewName;
+    }
+
     public MyModelAndView(@Nullable String viewName, @Nullable Map<String, ?> model, @Nullable MyHttpStatus status) {
         this.view = viewName;
         if (model != null) {

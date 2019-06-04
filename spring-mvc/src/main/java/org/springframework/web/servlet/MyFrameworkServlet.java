@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
 
 import org.springframework.web.context.MyConfigurableWebApplicationContext;
 import org.springframework.web.context.MyConfigurableWebEnvironment;
-import org.springframework.web.context.MyContextLoader;
+//import org.springframework.web.context.MyContextLoader;
 import org.springframework.web.context.MyWebApplicationContext;
 import org.springframework.web.context.request.MyNativeWebRequest;
 import org.springframework.web.context.request.MyRequestAttributes;
@@ -33,7 +33,7 @@ import org.springframework.web.context.request.async.MyWebAsyncManager;
 import org.springframework.web.context.request.async.MyWebAsyncUtils;
 
 import org.springframework.web.context.support.MyServletRequestHandledEvent;
-import org.springframework.web.context.support.MyWebApplicationContextUtils;
+//import org.springframework.web.context.support.MyWebApplicationContextUtils;
 import org.springframework.web.context.support.MyXmlWebApplicationContext;
 
 import org.springframework.web.util.MyNestedServletException;
@@ -119,8 +119,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
 
     protected MyWebApplicationContext initWebApplicationContext() {
-        MyWebApplicationContext rootContext =
-                MyWebApplicationContextUtils.getWebApplicationContext(getServletContext()); //null
+        MyWebApplicationContext rootContext = null; //null
         MyWebApplicationContext wac = null;
 
 
@@ -234,7 +233,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
 
     protected void applyInitializers(ConfigurableApplicationContext wac) {
-        String globalClassNames = getServletContext().getInitParameter(MyContextLoader.GLOBAL_INITIALIZER_CLASSES_PARAM);
+        String globalClassNames = null;
         if (globalClassNames != null) {
             for (String className : StringUtils.tokenizeToStringArray(globalClassNames, INIT_PARAM_DELIMITERS)) {
                 this.contextInitializers.add(loadInitializer(className, wac));

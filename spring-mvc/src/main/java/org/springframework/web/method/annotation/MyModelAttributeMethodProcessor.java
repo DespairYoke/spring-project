@@ -8,7 +8,10 @@ import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.util.Assert;
 import org.springframework.validation.AbstractBindingResult;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.MyWebDataBinder;
+import org.springframework.web.bind.annotation.MyModelAttribute;
 import org.springframework.web.bind.support.MyWebDataBinderFactory;
 import org.springframework.web.bind.support.MyWebRequestDataBinder;
 import org.springframework.web.context.request.MyNativeWebRequest;
@@ -18,6 +21,7 @@ import org.springframework.web.method.support.MyModelAndViewContainer;
 
 import java.beans.ConstructorProperties;
 import java.lang.reflect.Constructor;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -38,12 +42,75 @@ public class MyModelAttributeMethodProcessor implements MyHandlerMethodArgumentR
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return false;
+        return (parameter.hasParameterAnnotation(MyModelAttribute.class) ||
+                (this.annotationNotRequired && !BeanUtils.isSimpleProperty(parameter.getParameterType())));
+    }
+
+
+    protected void bindRequestParameters(MyWebDataBinder binder, MyNativeWebRequest request) {
+        ((MyWebRequestDataBinder) binder).bind(request);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, MyModelAndViewContainer mavContainer, MyNativeWebRequest webRequest, MyWebDataBinderFactory binderFactory) throws Exception {
-        return null;
+        Assert.state(mavContainer != null, "ModelAttributeMethodProcessor requires ModelAndViewContainer");
+        Assert.state(binderFactory != null, "ModelAttributeMethodProcessor requires WebDataBinderFactory");
+
+        String name = MyModelFactory.getNameForParameter(parameter);
+        MyModelAttribute ann = parameter.getParameterAnnotation(MyModelAttribute.class);
+        if (ann != null) {
+            mavContainer.setBinding(name, ann.binding());
+        }
+
+        Object attribute = null;
+        BindingResult bindingResult = null;
+
+        if (mavContainer.containsAttribute(name)) {
+            attribute = mavContainer.getModel().get(name);
+        }
+        else {
+            // Create attribute instance
+            try {
+                attribute = createAttribute(name, parameter, binderFactory, webRequest);
+            }
+            catch (BindException ex) {
+                if (isBindExceptionRequired(parameter)) {
+                    // No BindingResult parameter -> fail with BindException
+                    throw ex;
+                }
+                // Otherwise, expose null/empty value and associated BindingResult
+                if (parameter.getParameterType() == Optional.class) {
+                    attribute = Optional.empty();
+                }
+                bindingResult = ex.getBindingResult();
+            }
+        }
+
+        if (bindingResult == null) {
+            // Bean property binding and validation;
+            // skipped in case of binding failure on construction.
+            MyWebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);
+            if (binder.getTarget() != null) {
+                if (!mavContainer.isBindingDisabled(name)) {
+                    bindRequestParameters(binder, webRequest);
+                }
+                if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
+                    throw new BindException(binder.getBindingResult());
+                }
+            }
+            // Value type adaptation, also covering java.util.Optional
+            if (!parameter.getParameterType().isInstance(attribute)) {
+                attribute = binder.convertIfNecessary(binder.getTarget(), parameter.getParameterType(), parameter);
+            }
+            bindingResult = binder.getBindingResult();
+        }
+
+        // Add resolved attribute and BindingResult at the end of the model
+        Map<String, Object> bindingResultModel = bindingResult.getModel();
+//        mavContainer.removeAttributes(bindingResultModel);
+        mavContainer.addAllAttributes(bindingResultModel);
+
+        return attribute;
     }
 
     @Override
@@ -54,6 +121,17 @@ public class MyModelAttributeMethodProcessor implements MyHandlerMethodArgumentR
     @Override
     public void handleReturnValue(Object returnValue, MethodParameter returnType, MyModelAndViewContainer mavContainer, MyNativeWebRequest webRequest) throws Exception {
 
+    }
+
+    protected boolean isBindExceptionRequired(MethodParameter parameter) {
+        int i = parameter.getParameterIndex();
+        Class<?>[] paramTypes = parameter.getExecutable().getParameterTypes();
+        boolean hasBindingResult = (paramTypes.length > (i + 1) && Errors.class.isAssignableFrom(paramTypes[i + 1]));
+        return !hasBindingResult;
+    }
+
+    protected boolean isBindExceptionRequired(MyWebDataBinder binder, MethodParameter parameter) {
+        return isBindExceptionRequired(parameter);
     }
 
     protected Object createAttribute(String attributeName, MethodParameter parameter,
@@ -89,67 +167,13 @@ public class MyModelAttributeMethodProcessor implements MyHandlerMethodArgumentR
     protected Object constructAttribute(Constructor<?> ctor, String attributeName,
                                         MyWebDataBinderFactory binderFactory, MyNativeWebRequest webRequest) throws Exception {
 
+        //走这里
         if (ctor.getParameterCount() == 0) {
             // A single default constructor -> clearly a standard JavaBeans arrangement.
             return BeanUtils.instantiateClass(ctor);
         }
 
-        // A single data class constructor -> resolve constructor arguments from request parameters.
-        ConstructorProperties cp = ctor.getAnnotation(ConstructorProperties.class);
-        String[] paramNames = (cp != null ? cp.value() : parameterNameDiscoverer.getParameterNames(ctor));
-        Assert.state(paramNames != null, () -> "Cannot resolve parameter names for constructor " + ctor);
-        Class<?>[] paramTypes = ctor.getParameterTypes();
-        Assert.state(paramNames.length == paramTypes.length,
-                () -> "Invalid number of parameter names: " + paramNames.length + " for constructor " + ctor);
-
-        Object[] args = new Object[paramTypes.length];
-        MyWebDataBinder binder = binderFactory.createBinder(webRequest, null, attributeName);
-        String fieldDefaultPrefix = binder.getFieldDefaultPrefix();
-        String fieldMarkerPrefix = binder.getFieldMarkerPrefix();
-        boolean bindingFailure = false;
-
-        for (int i = 0; i < paramNames.length; i++) {
-            String paramName = paramNames[i];
-            Class<?> paramType = paramTypes[i];
-            Object value = webRequest.getParameterValues(paramName);
-            if (value == null) {
-                if (fieldDefaultPrefix != null) {
-                    value = webRequest.getParameter(fieldDefaultPrefix + paramName);
-                }
-                if (value == null && fieldMarkerPrefix != null) {
-                    if (webRequest.getParameter(fieldMarkerPrefix + paramName) != null) {
-                        value = binder.getEmptyValue(paramType);
-                    }
-                }
-            }
-            try {
-                MethodParameter methodParam = new MethodParameter(ctor, i);
-                if (value == null && methodParam.isOptional()) {
-                    args[i] = (methodParam.getParameterType() == Optional.class ? Optional.empty() : null);
-                }
-                else {
-                    args[i] = binder.convertIfNecessary(value, paramType, methodParam);
-                }
-            }
-            catch (TypeMismatchException ex) {
-                ex.initPropertyName(paramName);
-                binder.getBindingErrorProcessor().processPropertyAccessException(ex, binder.getBindingResult());
-                bindingFailure = true;
-                args[i] = value;
-            }
-        }
-
-        if (bindingFailure) {
-            if (binder.getBindingResult() instanceof AbstractBindingResult) {
-                AbstractBindingResult result = (AbstractBindingResult) binder.getBindingResult();
-                for (int i = 0; i < paramNames.length; i++) {
-                    result.recordFieldValue(paramNames[i], paramTypes[i], args[i]);
-                }
-            }
-            throw new BindException(binder.getBindingResult());
-        }
-
-        return BeanUtils.instantiateClass(ctor, args);
+     return null;
     }
 
 

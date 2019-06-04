@@ -2,7 +2,6 @@ package org.springframework.web.context.support;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ApplicationObjectSupport;
-import org.springframework.web.context.MyServletContextAware;
 import org.springframework.web.context.MyWebApplicationContext;
 
 import javax.servlet.ServletContext;
@@ -13,17 +12,10 @@ import javax.servlet.ServletContext;
  * @author zwd
  * @since 2019-05-27
  **/
-public abstract class MyWebApplicationObjectSupport extends ApplicationObjectSupport implements MyServletContextAware {
+public abstract class MyWebApplicationObjectSupport extends ApplicationObjectSupport  {
 
     private ServletContext servletContext;
 
-    @Override
-    public final void setServletContext(ServletContext servletContext) {
-        if (servletContext != this.servletContext) {
-            this.servletContext = servletContext;
-            initServletContext(servletContext);
-        }
-    }
 
     protected void initServletContext(ServletContext servletContext) {
     }

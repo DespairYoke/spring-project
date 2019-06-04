@@ -136,5 +136,11 @@ public class MyServletModelAttributeMethodProcessor extends MyModelAttributeMeth
         return null;
     }
 
-
+    @Override
+    protected void bindRequestParameters(MyWebDataBinder binder, MyNativeWebRequest request) {
+        ServletRequest servletRequest = request.getNativeRequest(ServletRequest.class);
+        Assert.state(servletRequest != null, "No ServletRequest");
+        MyServletRequestDataBinder servletBinder = (MyServletRequestDataBinder) binder;
+        servletBinder.bind(servletRequest);
+    }
 }

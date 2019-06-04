@@ -1,5 +1,7 @@
 package org.springframework.web.context.request;
 
+import org.springframework.lang.Nullable;
+
 import java.util.Map;
 
 /**
@@ -15,4 +17,7 @@ public interface MyWebRequest  extends MyRequestAttributes {
     String[] getParameterValues(String paramName);
 
     Map<String, String[]> getParameterMap();
+
+    @Nullable
+    String getHeader(String headerName);
 }

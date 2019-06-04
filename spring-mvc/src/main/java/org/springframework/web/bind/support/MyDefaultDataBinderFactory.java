@@ -19,7 +19,26 @@ public class MyDefaultDataBinderFactory implements MyWebDataBinderFactory{
     }
 
     @Override
-    public MyWebDataBinder createBinder(MyNativeWebRequest webRequest, Object target, String objectName) throws Exception {
-        return null;
+    @SuppressWarnings("deprecation")
+    public final MyWebDataBinder createBinder(
+            MyNativeWebRequest webRequest, @Nullable Object target, String objectName) throws Exception {
+
+        MyWebDataBinder dataBinder = createBinderInstance(target, objectName, webRequest);
+        if (this.initializer != null) {
+            this.initializer.initBinder(dataBinder, webRequest);
+        }
+        initBinder(dataBinder, webRequest);
+        return dataBinder;
     }
+    protected MyWebDataBinder createBinderInstance(
+            @Nullable Object target, String objectName, MyNativeWebRequest webRequest) throws Exception {
+
+        return new MyWebRequestDataBinder(target, objectName);
+    }
+
+    protected void initBinder(MyWebDataBinder dataBinder, MyNativeWebRequest webRequest)
+            throws Exception {
+
+    }
+
 }

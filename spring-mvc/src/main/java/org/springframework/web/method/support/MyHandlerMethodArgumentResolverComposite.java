@@ -31,7 +31,7 @@ public class MyHandlerMethodArgumentResolverComposite implements MyHandlerMethod
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return false;
+        return (getArgumentResolver(parameter) != null);
     }
 
     public Object resolveArgument(MethodParameter parameter, @Nullable MyModelAndViewContainer mavContainer,

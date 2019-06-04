@@ -26,7 +26,7 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
     private static final MyProducesRequestCondition EMPTY_CONDITION = new MyProducesRequestCondition();
 
 
-    private final MyContentNegotiationManager contentNegotiationManager;
+//    private final MyContentNegotiationManager contentNegotiationManager;
 
     private final List<ProduceMediaTypeExpression> expressions;
 
@@ -44,16 +44,16 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
 
         this.expressions = new ArrayList<>(parseExpressions(produces, headers));
         Collections.sort(this.expressions);
-        this.contentNegotiationManager = (manager != null ? manager : new MyContentNegotiationManager());
+//        this.contentNegotiationManager = (manager != null ? manager : new MyContentNegotiationManager());
     }
 
-    private MyProducesRequestCondition(Collection<ProduceMediaTypeExpression> expressions,
-                                     @Nullable MyContentNegotiationManager manager) {
-
-        this.expressions = new ArrayList<>(expressions);
-        Collections.sort(this.expressions);
-        this.contentNegotiationManager = (manager != null ? manager : new MyContentNegotiationManager());
-    }
+//    private MyProducesRequestCondition(Collection<ProduceMediaTypeExpression> expressions,
+//                                     @Nullable MyContentNegotiationManager manager) {
+//
+//        this.expressions = new ArrayList<>(expressions);
+//        Collections.sort(this.expressions);
+//        this.contentNegotiationManager = (manager != null ? manager : new MyContentNegotiationManager());
+//    }
     @Override
     public MyProducesRequestCondition combine(MyProducesRequestCondition other) {
         return (!other.expressions.isEmpty() ? other : this);
@@ -62,37 +62,38 @@ public final class MyProducesRequestCondition  extends MyAbstractRequestConditio
     @Override
     @Nullable
     public MyProducesRequestCondition getMatchingCondition(HttpServletRequest request) {
-        if (MyCorsUtils.isPreFlightRequest(request)) {
-            return PRE_FLIGHT_MATCH;
-        }
-        if (isEmpty()) {
-            return this;
-        }
+//        if (MyCorsUtils.isPreFlightRequest(request)) {
+//            return PRE_FLIGHT_MATCH;
+//        }
+//        if (isEmpty()) {
+//
+//        }
+        return this;
+//        List<MyMediaType> acceptedMediaTypes;
+//        try {
+//            acceptedMediaTypes = getAcceptedMediaTypes(request);
+//        }
+//        catch (MyHttpMediaTypeException ex) {
+//            return null;
+//        }
+//
+//        Set<ProduceMediaTypeExpression> result = new LinkedHashSet<>(this.expressions);
+//        result.removeIf(expression -> !expression.match(acceptedMediaTypes));
+//        if (!result.isEmpty()) {
+//            return new MyProducesRequestCondition(result, this.contentNegotiationManager);
+//        }
+//        else if (acceptedMediaTypes.contains(MyMediaType.ALL)) {
+//            return EMPTY_CONDITION;
+//        }
+//        else {
+//            return null;
+//        }
 
-        List<MyMediaType> acceptedMediaTypes;
-        try {
-            acceptedMediaTypes = getAcceptedMediaTypes(request);
-        }
-        catch (MyHttpMediaTypeException ex) {
-            return null;
-        }
-
-        Set<ProduceMediaTypeExpression> result = new LinkedHashSet<>(this.expressions);
-        result.removeIf(expression -> !expression.match(acceptedMediaTypes));
-        if (!result.isEmpty()) {
-            return new MyProducesRequestCondition(result, this.contentNegotiationManager);
-        }
-        else if (acceptedMediaTypes.contains(MyMediaType.ALL)) {
-            return EMPTY_CONDITION;
-        }
-        else {
-            return null;
-        }
     }
 
-    private List<MyMediaType> getAcceptedMediaTypes(HttpServletRequest request) throws MyHttpMediaTypeNotAcceptableException {
-        return this.contentNegotiationManager.resolveMediaTypes(new MyServletWebRequest(request));
-    }
+//    private List<MyMediaType> getAcceptedMediaTypes(HttpServletRequest request) throws MyHttpMediaTypeNotAcceptableException {
+//        return this.contentNegotiationManager.resolveMediaTypes(new MyServletWebRequest(request));
+//    }
 
     @Override
     public int compareTo(MyProducesRequestCondition other, HttpServletRequest request) {

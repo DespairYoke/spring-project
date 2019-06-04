@@ -5,10 +5,12 @@ import org.springframework.core.CollectionFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.DataBinder;
 import org.springframework.web.context.request.MyWebRequest;
+import org.springframework.web.multipart.MyMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -90,5 +92,17 @@ public class MyWebDataBinder extends DataBinder {
 //        }
 //        doBind(mpvs);
 //    }
-
+protected void bindMultipart(Map<String, List<MyMultipartFile>> multipartFiles, MutablePropertyValues mpvs) {
+    multipartFiles.forEach((key, values) -> {
+        if (values.size() == 1) {
+            MyMultipartFile value = values.get(0);
+            if (isBindEmptyMultipartFiles() || !value.isEmpty()) {
+                mpvs.add(key, value);
+            }
+        }
+        else {
+            mpvs.add(key, values);
+        }
+    });
+}
 }
