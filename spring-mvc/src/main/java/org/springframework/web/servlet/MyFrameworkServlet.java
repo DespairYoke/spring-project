@@ -6,6 +6,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.*;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.MyContextRefreshedEvent;
+import org.springframework.context.event.MySourceFilteringListener;
 import org.springframework.context.event.SourceFilteringListener;
 import org.springframework.context.i18n.LocaleContext;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -134,10 +136,10 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
 
     protected MyWebApplicationContext createWebApplicationContext(@Nullable MyWebApplicationContext parent) {
-        return createWebApplicationContext((ApplicationContext) parent);
+        return createWebApplicationContext((MyApplicationContext) parent);
     }
 
-    protected MyWebApplicationContext createWebApplicationContext(@Nullable ApplicationContext parent) {
+    protected MyWebApplicationContext createWebApplicationContext(@Nullable MyApplicationContext parent) {
         /**
          * 获取加载方式，默认为{@link XmlWebApplicationContext}
          */
@@ -186,7 +188,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
         wac.setServletContext(getServletContext());
         wac.setServletConfig(getServletConfig());
         wac.setNamespace(getNamespace());
-        wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));
+        wac.addApplicationListener(new MySourceFilteringListener(wac, new ContextRefreshListener()));
 
         // The wac environment's #initPropertySources will be called in any case when the context
         // is refreshed; do it eagerly here to ensure servlet property sources are in place for
@@ -207,21 +209,21 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     }
 
 
-    private class ContextRefreshListener implements ApplicationListener<ContextRefreshedEvent> {
+    private class ContextRefreshListener implements MyApplicationListener<MyContextRefreshedEvent> {
 
         @Override
-        public void onApplicationEvent(ContextRefreshedEvent event) {
+        public void onApplicationEvent(MyContextRefreshedEvent event) {
             MyFrameworkServlet.this.onApplicationEvent(event);
         }
     }
 
 
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(MyContextRefreshedEvent event) {
         this.refreshEventReceived = true;
         onRefresh(event.getApplicationContext());
     }
 
-    protected void onRefresh(ApplicationContext context) {
+    protected void onRefresh(MyApplicationContext context) {
         // For subclasses: do nothing by default.
     }
 
@@ -232,7 +234,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     }
 
 
-    protected void applyInitializers(ConfigurableApplicationContext wac) {
+    protected void applyInitializers(MyConfigurableApplicationContext wac) {
         String globalClassNames = null;
         if (globalClassNames != null) {
             for (String className : StringUtils.tokenizeToStringArray(globalClassNames, INIT_PARAM_DELIMITERS)) {
