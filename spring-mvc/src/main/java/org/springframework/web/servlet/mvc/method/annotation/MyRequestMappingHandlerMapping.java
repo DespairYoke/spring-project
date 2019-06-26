@@ -2,7 +2,7 @@ package org.springframework.web.servlet.mvc.method.annotation;
 
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.MyController;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.MyRequestMapping;
 
@@ -10,10 +10,8 @@ import org.springframework.web.servlet.mvc.condition.MyRequestCondition;
 import org.springframework.web.servlet.mvc.method.MyRequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.MyRequestMappingInfoHandlerMapping;
 
-import javax.servlet.ServletContext;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.Set;
 
 /**
  * TODO...
@@ -41,7 +39,7 @@ public class MyRequestMappingHandlerMapping extends MyRequestMappingInfoHandlerM
 
     @Override
     protected boolean isHandler(Class<?> beanType) {
-        return (AnnotatedElementUtils.hasAnnotation(beanType, Controller.class) ||
+        return (AnnotatedElementUtils.hasAnnotation(beanType, MyController.class) ||
                 AnnotatedElementUtils.hasAnnotation(beanType, MyRequestMapping.class));
     }
 

@@ -5,12 +5,12 @@ package org.springframework.web.servlet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.MyApplicationContext;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.lang.Nullable;
-import org.springframework.ui.context.ThemeSource;
+import org.springframework.ui.context.MyThemeSource;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
@@ -68,20 +68,20 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
         }
     }
 
-    protected void onRefresh(ApplicationContext context) {
+    protected void onRefresh(MyApplicationContext context) {
 
         System.out.println("=======dispatherServlet onfresh");
         initStrategies(context);
     }
 
 
-    public void initStrategies(ApplicationContext context) {
+    public void initStrategies(MyApplicationContext context) {
         initHandlerMappings(context);
         initHandlerAdapters(context);
         initViewResolvers(context);
     }
 
-    private void initHandlerMappings(ApplicationContext context) {
+    private void initHandlerMappings(MyApplicationContext context) {
 
         this.handlerMappings = null;
         if (this.handlerMappings == null) {
@@ -91,13 +91,13 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
             }
         }
     }
-    private void initHandlerAdapters(ApplicationContext context) {
+    private void initHandlerAdapters(MyApplicationContext context) {
 
         this.handlerAdapters = getDefaultStrategies(context, MyHandlerAdapter.class);
 
     }
 
-    private void initViewResolvers(ApplicationContext context) {
+    private void initViewResolvers(MyApplicationContext context) {
         this.viewResolvers = null;
         //加载app-context.xml中配置的viewResolver
         if (this.detectAllViewResolvers) {
@@ -117,7 +117,7 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
         }
     }
 
-    protected <T> List<T> getDefaultStrategies(ApplicationContext context, Class<T> strategyInterface) {
+    protected <T> List<T> getDefaultStrategies(MyApplicationContext context, Class<T> strategyInterface) {
 
         String key = strategyInterface.getName();
 
@@ -145,7 +145,7 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
 
     }
 
-    protected Object createDefaultStrategy(ApplicationContext context, Class<?> clazz) {
+    protected Object createDefaultStrategy(MyApplicationContext context, Class<?> clazz) {
         return context.getAutowireCapableBeanFactory().createBean(clazz);
     }
 
@@ -160,8 +160,8 @@ public class MyDispatcherServlet extends MyFrameworkServlet{
     }
 
     @Nullable
-    public final ThemeSource getThemeSource() {
-        return (getWebApplicationContext() instanceof ThemeSource ? (ThemeSource) getWebApplicationContext() : null);
+    public final MyThemeSource getThemeSource() {
+        return (getWebApplicationContext() instanceof MyThemeSource ? (MyThemeSource) getWebApplicationContext() : null);
     }
 
     protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {

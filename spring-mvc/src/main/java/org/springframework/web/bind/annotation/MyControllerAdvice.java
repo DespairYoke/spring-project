@@ -1,7 +1,7 @@
 package org.springframework.web.bind.annotation;
 
 import org.springframework.core.annotation.AliasFor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.MyComponent;
 
 import java.lang.annotation.*;
 
@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Component
+@MyComponent
 public @interface MyControllerAdvice {
 
     @AliasFor("value")

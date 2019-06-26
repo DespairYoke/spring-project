@@ -2,8 +2,8 @@ package org.springframework.web.method.support;
 
 import org.springframework.http.MyHttpStatus;
 import org.springframework.lang.Nullable;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.support.BindingAwareModelMap;
+import org.springframework.ui.MyModelMap;
+import org.springframework.validation.support.MyBindingAwareModelMap;
 import org.springframework.web.bind.support.MySessionStatus;
 import org.springframework.web.bind.support.MySimpleSessionStatus;
 
@@ -21,11 +21,11 @@ public class MyModelAndViewContainer {
 
     private boolean ignoreDefaultModelOnRedirect = false;
 
-    private final ModelMap defaultModel = new BindingAwareModelMap();
+    private final MyModelMap defaultModel = new MyBindingAwareModelMap();
 
     private Object view;
     @Nullable
-    private ModelMap redirectModel;
+    private MyModelMap redirectModel;
 
     private boolean redirectModelScenario = false;
 
@@ -39,7 +39,7 @@ public class MyModelAndViewContainer {
 
     private final Set<String> noBinding = new HashSet<>(4);
 
-    public ModelMap getDefaultModel() {
+    public MyModelMap getDefaultModel() {
         return this.defaultModel;
     }
 
@@ -87,13 +87,13 @@ public class MyModelAndViewContainer {
         return (this.view instanceof String);
     }
 
-    public ModelMap getModel() {
+    public MyModelMap getModel() {
         if (useDefaultModel()) {
             return this.defaultModel;
         }
         else {
             if (this.redirectModel == null) {
-                this.redirectModel = new ModelMap();
+                this.redirectModel = new MyModelMap();
             }
             return this.redirectModel;
         }

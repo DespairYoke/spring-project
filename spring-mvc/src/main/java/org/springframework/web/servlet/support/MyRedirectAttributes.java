@@ -1,7 +1,7 @@
 package org.springframework.web.servlet.support;
 
 import org.springframework.lang.Nullable;
-import org.springframework.ui.Model;
+import org.springframework.ui.MyModel;
 
 import java.util.Collection;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
  * @author zwd
  * @since 2019-05-10
  **/
-public interface MyRedirectAttributes extends Model {
+public interface MyRedirectAttributes extends MyModel {
 
     @Override
     MyRedirectAttributes addAttribute(String attributeName, @Nullable Object attributeValue);

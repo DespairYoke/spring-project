@@ -5,13 +5,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.*;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.MyContextRefreshedEvent;
 import org.springframework.context.event.MySourceFilteringListener;
-import org.springframework.context.event.SourceFilteringListener;
-import org.springframework.context.i18n.LocaleContext;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.i18n.SimpleLocaleContext;
+import org.springframework.context.i18n.MyLocaleContext;
+import org.springframework.context.i18n.MyLocaleContextHolder;
+import org.springframework.context.i18n.MySimpleLocaleContext;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -92,7 +90,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     private boolean threadContextInheritable = false;
 
 
-    private final List<ApplicationContextInitializer<ConfigurableApplicationContext>> contextInitializers =
+    private final List<MyApplicationContextInitializer<MyConfigurableApplicationContext>> contextInitializers =
             new ArrayList<>();
 
     @Override
@@ -141,7 +139,7 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
     protected MyWebApplicationContext createWebApplicationContext(@Nullable MyApplicationContext parent) {
         /**
-         * 获取加载方式，默认为{@link XmlWebApplicationContext}
+         * 获取加载方式，默认为{@link MyXmlWebApplicationContext}
          */
         Class<?> contextClass = getContextClass();
 
@@ -249,28 +247,28 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
         }
 
         AnnotationAwareOrderComparator.sort(this.contextInitializers);
-        for (ApplicationContextInitializer<ConfigurableApplicationContext> initializer : this.contextInitializers) {
+        for (MyApplicationContextInitializer<MyConfigurableApplicationContext> initializer : this.contextInitializers) {
             initializer.initialize(wac);
         }
     }
 
-    private ApplicationContextInitializer<ConfigurableApplicationContext> loadInitializer(
-            String className, ConfigurableApplicationContext wac) {
+    private MyApplicationContextInitializer<MyConfigurableApplicationContext> loadInitializer(
+            String className, MyConfigurableApplicationContext wac) {
         try {
             Class<?> initializerClass = ClassUtils.forName(className, wac.getClassLoader());
             Class<?> initializerContextClass =
-                    GenericTypeResolver.resolveTypeArgument(initializerClass, ApplicationContextInitializer.class);
+                    GenericTypeResolver.resolveTypeArgument(initializerClass, MyApplicationContextInitializer.class);
             if (initializerContextClass != null && !initializerContextClass.isInstance(wac)) {
-                throw new ApplicationContextException(String.format(
-                        "Could not apply context initializer [%s] since its generic parameter [%s] " +
-                                "is not assignable from the type of application context used by this " +
-                                "framework servlet: [%s]", initializerClass.getName(), initializerContextClass.getName(),
-                        wac.getClass().getName()));
+//                throw new MyApplicationContextException(String.format(
+//                        "Could not apply context initializer [%s] since its generic parameter [%s] " +
+//                                "is not assignable from the type of application context used by this " +
+//                                "framework servlet: [%s]", initializerClass.getName(), initializerContextClass.getName(),
+//                        wac.getClass().getName()));
             }
-            return BeanUtils.instantiateClass(initializerClass, ApplicationContextInitializer.class);
+            return BeanUtils.instantiateClass(initializerClass, MyApplicationContextInitializer.class);
         }
         catch (ClassNotFoundException ex) {
-            throw new ApplicationContextException(String.format("Could not load class [%s] specified " +
+            throw new MyApplicationContextException(String.format("Could not load class [%s] specified " +
                     "via 'contextInitializerClasses' init-param", className), ex);
         }
     }
@@ -315,8 +313,8 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
         long startTime = System.currentTimeMillis();
         Throwable failureCause = null;
 
-        LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
-        LocaleContext localeContext = buildLocaleContext(request);
+        MyLocaleContext previousLocaleContext = MyLocaleContextHolder.getLocaleContext();
+        MyLocaleContext localeContext = buildLocaleContext(request);
 
         MyRequestAttributes previousAttributes = MyRequestContextHolder.getRequestAttributes();
         MyServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
@@ -363,8 +361,8 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
     }
 
     @Nullable
-    protected LocaleContext buildLocaleContext(HttpServletRequest request) {
-        return new SimpleLocaleContext(request.getLocale());
+    protected MyLocaleContext buildLocaleContext(HttpServletRequest request) {
+        return new MySimpleLocaleContext(request.getLocale());
     }
 
     @Nullable
@@ -401,10 +399,10 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
 
     private void initContextHolders(HttpServletRequest request,
-                                    @Nullable LocaleContext localeContext, @Nullable MyRequestAttributes requestAttributes) {
+                                    @Nullable MyLocaleContext localeContext, @Nullable MyRequestAttributes requestAttributes) {
 
         if (localeContext != null) {
-            LocaleContextHolder.setLocaleContext(localeContext, this.threadContextInheritable);
+            MyLocaleContextHolder.setLocaleContext(localeContext, this.threadContextInheritable);
         }
         if (requestAttributes != null) {
             MyRequestContextHolder.setRequestAttributes(requestAttributes, this.threadContextInheritable);
@@ -419,9 +417,9 @@ public abstract class MyFrameworkServlet extends MyHttpServletBean{
 
 
     private void resetContextHolders(HttpServletRequest request,
-                                     @Nullable LocaleContext prevLocaleContext, @Nullable MyRequestAttributes previousAttributes) {
+                                     @Nullable MyLocaleContext prevLocaleContext, @Nullable MyRequestAttributes previousAttributes) {
 
-        LocaleContextHolder.setLocaleContext(prevLocaleContext, this.threadContextInheritable);
+        MyLocaleContextHolder.setLocaleContext(prevLocaleContext, this.threadContextInheritable);
         MyRequestContextHolder.setRequestAttributes(previousAttributes, this.threadContextInheritable);
         if (logger.isTraceEnabled()) {
             logger.trace("Cleared thread-bound request context: " + request);

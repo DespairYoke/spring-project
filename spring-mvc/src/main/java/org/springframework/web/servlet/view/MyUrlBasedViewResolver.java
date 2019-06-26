@@ -1,7 +1,7 @@
 package org.springframework.web.servlet.view;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.MyApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.PatternMatchUtils;
@@ -233,7 +233,7 @@ public class MyUrlBasedViewResolver extends MyAbstractCachingViewResolver{
     }
 
     protected MyView applyLifecycleMethods(String viewName, MyAbstractUrlBasedView view) {
-        ApplicationContext context = getApplicationContext();
+        MyApplicationContext context = getApplicationContext();
         if (context != null) {
             Object initialized = context.getAutowireCapableBeanFactory().initializeBean(view, viewName);
             if (initialized instanceof MyView) {

@@ -17,4 +17,5 @@ public interface MyHierarchicalMessageSource  extends MyMessageSource {
      */
     @Nullable
     MyMessageSource getParentMessageSource();
+
 }

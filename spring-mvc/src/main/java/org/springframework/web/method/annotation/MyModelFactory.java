@@ -6,9 +6,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.core.Conventions;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.MyModelMap;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MyWebDataBinder;
 import org.springframework.web.bind.annotation.MyModelAttribute;
 import org.springframework.web.bind.support.MyWebDataBinderFactory;
@@ -55,7 +54,7 @@ public final class MyModelFactory {
     }
 
     public void updateModel(MyNativeWebRequest request, MyModelAndViewContainer container) throws Exception {
-        ModelMap defaultModel = container.getDefaultModel();
+        MyModelMap defaultModel = container.getDefaultModel();
         if (container.getSessionStatus().isComplete()){
             this.sessionAttributesHandler.cleanupAttributes(request);
         }
@@ -63,36 +62,36 @@ public final class MyModelFactory {
             this.sessionAttributesHandler.storeAttributes(request, defaultModel);
         }
         if (!container.isRequestHandled() && container.getModel() == defaultModel) {
-            updateBindingResult(request, defaultModel);
+//            updateBindingResult(request, defaultModel);
         }
     }
 
-    private void updateBindingResult(MyNativeWebRequest request, ModelMap model) throws Exception {
-        List<String> keyNames = new ArrayList<>(model.keySet());
-        for (String name : keyNames) {
-            Object value = model.get(name);
-            if (value != null && isBindingCandidate(name, value)) {
-                String bindingResultKey = BindingResult.MODEL_KEY_PREFIX + name;
-                if (!model.containsAttribute(bindingResultKey)) {
-                    MyWebDataBinder dataBinder = this.dataBinderFactory.createBinder(request, value, name);
-                    model.put(bindingResultKey, dataBinder.getBindingResult());
-                }
-            }
-        }
-    }
+//    private void updateBindingResult(MyNativeWebRequest request, MyModelMap model) throws Exception {
+//        List<String> keyNames = new ArrayList<>(model.keySet());
+//        for (String name : keyNames) {
+//            Object value = model.get(name);
+//            if (value != null && isBindingCandidate(name, value)) {
+//                String bindingResultKey = BindingResult.MODEL_KEY_PREFIX + name;
+//                if (!model.containsAttribute(bindingResultKey)) {
+//                    MyWebDataBinder dataBinder = this.dataBinderFactory.createBinder(request, value, name);
+//                    model.put(bindingResultKey, dataBinder.getBindingResult());
+//                }
+//            }
+//        }
+//    }
 
-    private boolean isBindingCandidate(String attributeName, Object value) {
-        if (attributeName.startsWith(BindingResult.MODEL_KEY_PREFIX)) {
-            return false;
-        }
-
-        if (this.sessionAttributesHandler.isHandlerSessionAttribute(attributeName, value.getClass())) {
-            return true;
-        }
-
-        return (!value.getClass().isArray() && !(value instanceof Collection) &&
-                !(value instanceof Map) && !BeanUtils.isSimpleValueType(value.getClass()));
-    }
+//    private boolean isBindingCandidate(String attributeName, Object value) {
+//        if (attributeName.startsWith(BindingResult.MODEL_KEY_PREFIX)) {
+//            return false;
+//        }
+//
+//        if (this.sessionAttributesHandler.isHandlerSessionAttribute(attributeName, value.getClass())) {
+//            return true;
+//        }
+//
+//        return (!value.getClass().isArray() && !(value instanceof Collection) &&
+//                !(value instanceof Map) && !BeanUtils.isSimpleValueType(value.getClass()));
+//    }
     private static class ModelMethod {
 
         private final MyInvocableHandlerMethod handlerMethod;

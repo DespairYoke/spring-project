@@ -1,6 +1,5 @@
 package org.springframework.web.context;
 
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.lang.Nullable;
 
 import javax.servlet.ServletConfig;
@@ -12,7 +11,7 @@ import javax.servlet.ServletContext;
  * @author zwd
  * @since 2019-05-24
  **/
-public interface MyConfigurableWebApplicationContext extends MyWebApplicationContext, ConfigurableApplicationContext {
+public interface MyConfigurableWebApplicationContext extends MyWebApplicationContext, MyConfigurableApplicationContext {
 
     String APPLICATION_CONTEXT_ID_PREFIX = MyWebApplicationContext.class.getName() + ":";
 

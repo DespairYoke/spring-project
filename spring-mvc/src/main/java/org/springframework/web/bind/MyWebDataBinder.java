@@ -3,11 +3,9 @@ package org.springframework.web.bind;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.core.CollectionFactory;
 import org.springframework.lang.Nullable;
-import org.springframework.validation.DataBinder;
-import org.springframework.web.context.request.MyWebRequest;
+import org.springframework.validation.MyDataBinder;
 import org.springframework.web.multipart.MyMultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +17,9 @@ import java.util.Map;
  * @author zwd
  * @since 2019-05-29
  **/
-public class MyWebDataBinder extends DataBinder {
+public class MyWebDataBinder extends MyDataBinder {
+
+
 
     public static final String DEFAULT_FIELD_DEFAULT_PREFIX = "!";
 

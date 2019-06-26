@@ -32,7 +32,7 @@ public class MyServletRequestDataBinder extends MyWebDataBinder{
             bindMultipart(multipartRequest.getMultiFileMap(), mpvs);
         }
         addBindValues(mpvs, request);
-        doBind(mpvs);
+//        doBind(mpvs);
     }
 
     protected void addBindValues(MutablePropertyValues mpvs, ServletRequest request) {

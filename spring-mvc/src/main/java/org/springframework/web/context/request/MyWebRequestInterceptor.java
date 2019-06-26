@@ -1,7 +1,7 @@
 package org.springframework.web.context.request;
 
 import org.springframework.lang.Nullable;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.MyModelMap;
 
 /**
  * TODO...
@@ -11,7 +11,7 @@ import org.springframework.ui.ModelMap;
  **/
 public interface MyWebRequestInterceptor {
 
-    void postHandle(MyWebRequest request, @Nullable ModelMap model) throws Exception;
+    void postHandle(MyWebRequest request, @Nullable MyModelMap model) throws Exception;
 
 
     void afterCompletion(MyWebRequest request, @Nullable Exception ex) throws Exception;

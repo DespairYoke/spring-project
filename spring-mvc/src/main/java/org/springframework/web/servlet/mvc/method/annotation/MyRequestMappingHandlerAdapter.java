@@ -22,7 +22,7 @@ import org.springframework.http.converter.support.MyAllEncompassingFormHttpMessa
 import org.springframework.http.converter.xml.MySourceHttpMessageConverter;
 
 import org.springframework.lang.Nullable;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.MyModelMap;
 
 import org.springframework.web.bind.annotation.MyInitBinder;
 import org.springframework.web.bind.annotation.MyModelAttribute;
@@ -246,7 +246,7 @@ public class MyRequestMappingHandlerAdapter extends MyAbstractHandlerMethodAdapt
         if (mavContainer.isRequestHandled()) {
             return null;
         }
-        ModelMap model = mavContainer.getModel();
+        MyModelMap model = mavContainer.getModel();
         MyModelAndView mav = new MyModelAndView(mavContainer.getViewName(), model, mavContainer.getStatus());
         if (!mavContainer.isViewReference()) {
             mav.setView((MyView) mavContainer.getView());

@@ -2,7 +2,7 @@ package org.springframework.web.servlet;
 
 import org.springframework.http.MyHttpStatus;
 import org.springframework.lang.Nullable;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.MyModelMap;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public class MyModelAndView {
 
     /** Model Map */
     @Nullable
-    private ModelMap model;
+    private MyModelMap model;
 
     /** Optional HTTP status for the response */
     @Nullable
@@ -58,9 +58,9 @@ public class MyModelAndView {
         return (this.view instanceof MyView ? (MyView) this.view : null);
     }
 
-    public ModelMap getModelMap() {
+    public MyModelMap getModelMap() {
         if (this.model == null) {
-            this.model = new ModelMap();
+            this.model = new MyModelMap();
         }
         return this.model;
     }

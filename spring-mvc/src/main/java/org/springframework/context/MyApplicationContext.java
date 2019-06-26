@@ -2,6 +2,7 @@ package org.springframework.context;
 
 import org.springframework.beans.factory.HierarchicalBeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.core.env.EnvironmentCapable;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
@@ -17,4 +18,6 @@ public interface MyApplicationContext extends EnvironmentCapable, ListableBeanFa
     String getId();
 
     String getDisplayName();
+
+    AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException;
 }

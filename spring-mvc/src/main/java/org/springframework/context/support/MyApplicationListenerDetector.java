@@ -1,7 +1,9 @@
 package org.springframework.context.support;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
  * TODO...
@@ -15,5 +17,15 @@ class MyApplicationListenerDetector implements DestructionAwareBeanPostProcessor
 
     public MyApplicationListenerDetector(MyAbstractApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void postProcessBeforeDestruction(Object o, String s) throws BeansException {
+
+    }
+
+    @Override
+    public void postProcessMergedBeanDefinition(RootBeanDefinition rootBeanDefinition, Class<?> aClass, String s) {
+
     }
 }

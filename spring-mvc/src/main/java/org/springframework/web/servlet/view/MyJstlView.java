@@ -1,12 +1,10 @@
 package org.springframework.web.servlet.view;
 
-import org.springframework.context.MessageSource;
+import org.springframework.context.MyMessageSource;
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.support.MyJstlUtils;
-import org.springframework.web.servlet.support.MyRequestContext;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * TODO...
@@ -17,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 public class MyJstlView extends MyInternalResourceView{
 
     @Nullable
-    private MessageSource messageSource;
+    private MyMessageSource messageSource;
 
 
 
@@ -30,7 +28,7 @@ public class MyJstlView extends MyInternalResourceView{
     }
 
 
-    public MyJstlView(String url, MessageSource messageSource) {
+    public MyJstlView(String url, MyMessageSource messageSource) {
         this(url);
         this.messageSource = messageSource;
     }
@@ -44,15 +42,15 @@ public class MyJstlView extends MyInternalResourceView{
         super.initServletContext(servletContext);
     }
 
-    @Override
-    protected void exposeHelpers(HttpServletRequest request) throws Exception {
-        if (this.messageSource != null) {
-            MyJstlUtils.exposeLocalizationContext(request, this.messageSource);
-        }
-        else {
-            MyJstlUtils.exposeLocalizationContext(new MyRequestContext(request, getServletContext()));
-        }
-    }
+//    @Override
+//    protected void exposeHelpers(HttpServletRequest request) throws Exception {
+//        if (this.messageSource != null) {
+//            MyJstlUtils.exposeLocalizationContext(request, this.messageSource);
+//        }
+//        else {
+//            MyJstlUtils.exposeLocalizationContext(new MyRequestContext(request, getServletContext()));
+//        }
+//    }
 
 
 }

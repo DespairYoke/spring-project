@@ -13,7 +13,7 @@ import java.io.Closeable;
  * @author zwd
  * @since 2019-06-04
  **/
-public interface MyConfigurableApplicationContext extends MyApplicationContext, Lifecycle, Closeable {
+public interface MyConfigurableApplicationContext extends MyApplicationContext, MyLifecycle, Closeable {
 
     String LOAD_TIME_WEAVER_BEAN_NAME = "loadTimeWeaver";
 
@@ -44,4 +44,7 @@ public interface MyConfigurableApplicationContext extends MyApplicationContext, 
     void addApplicationListener(MyApplicationListener<?> listener);
 
     ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
+
+    @Override
+    ConfigurableEnvironment getEnvironment();
 }

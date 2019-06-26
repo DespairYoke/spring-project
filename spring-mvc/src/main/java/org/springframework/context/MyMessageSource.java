@@ -15,9 +15,9 @@ public interface MyMessageSource {
     String getMessage(String code, @Nullable Object[] args, @Nullable String defaultMessage, Locale locale);
 
 
-    String getMessage(String code, @Nullable Object[] args, Locale locale) throws NoSuchMessageException;
+    String getMessage(String code, @Nullable Object[] args, Locale locale);
 
 
-    String getMessage(MessageSourceResolvable resolvable, Locale locale) throws NoSuchMessageException;
+    String getMessage(MyMessageSourceResolvable resolvable, Locale locale);
 
 }

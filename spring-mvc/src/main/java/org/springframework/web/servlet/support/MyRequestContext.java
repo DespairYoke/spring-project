@@ -1,8 +1,6 @@
 package org.springframework.web.servlet.support;
 
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContext;
-import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
+import org.springframework.context.MyMessageSource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.MyWebApplicationContext;
@@ -117,11 +115,11 @@ public class MyRequestContext {
         // Determine locale to use for this RequestContext.
         MyLocaleResolver localeResolver = MyRequestContextUtils.getLocaleResolver(request);
         if (localeResolver instanceof MyLocaleContextResolver) {
-            LocaleContext localeContext = ((MyLocaleContextResolver) localeResolver).resolveLocaleContext(request);
-            locale = localeContext.getLocale();
-            if (localeContext instanceof TimeZoneAwareLocaleContext) {
-                timeZone = ((TimeZoneAwareLocaleContext) localeContext).getTimeZone();
-            }
+//            MyLocaleContext localeContext = ((MyLocaleContextResolver) localeResolver).resolveLocaleContext(request);
+//            locale = localeContext.getLocale();
+//            if (localeContext instanceof TimeZoneAwareLocaleContext) {
+//                timeZone = ((TimeZoneAwareLocaleContext) localeContext).getTimeZone();
+//            }
         }
         else if (localeResolver != null) {
             // Try LocaleResolver (we're within a DispatcherServlet request).
@@ -186,7 +184,7 @@ public class MyRequestContext {
         }
     }
 
-    public final MessageSource getMessageSource() {
+    public final MyMessageSource getMessageSource() {
         return this.webApplicationContext;
     }
 

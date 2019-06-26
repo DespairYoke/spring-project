@@ -49,9 +49,10 @@ public class MyInitBinderDataBinderFactory extends MyDefaultDataBinderFactory {
     }
 
     protected boolean isBinderMethodApplicable(MyHandlerMethod binderMethod, MyWebDataBinder binder) {
-        MyInitBinder ann = binderMethod.getMethodAnnotation(MyInitBinder.class);
-        Assert.state(ann != null, "No InitBinder annotation");
-        Collection<String> names = Arrays.asList(ann.value());
-        return (names.isEmpty() || names.contains(binder.getObjectName()));
+//        MyInitBinder ann = binderMethod.getMethodAnnotation(MyInitBinder.class);
+//        Assert.state(ann != null, "No InitBinder annotation");
+//        Collection<String> names = Arrays.asList(ann.value());
+//        return (names.isEmpty() || names.contains(binder.getObjectName()));
+        return false;
     }
 }

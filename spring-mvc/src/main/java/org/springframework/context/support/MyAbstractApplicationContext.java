@@ -9,6 +9,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.support.ResourceEditorRegistrar;
 import org.springframework.context.*;
 import org.springframework.context.event.MyApplicationEventMulticaster;
+import org.springframework.context.event.MyContextRefreshedEvent;
 import org.springframework.context.event.MySimpleApplicationEventMulticaster;
 import org.springframework.context.expression.MyStandardBeanExpressionResolver;
 import org.springframework.context.weaving.MyLoadTimeWeaverAware;
@@ -69,7 +70,7 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
             // Prepare this context for refreshing.
             prepareRefresh();
 
-            // Tell the subclass to refresh the internal bean factory.
+            // 创建beanfactroy并获取beanfactory 如果有则删除 重新创建 并加载application.xml
             ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
             // Prepare the bean factory for use in this context.
@@ -100,7 +101,7 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
                 // Instantiate all remaining (non-lazy-init) singletons.
                 finishBeanFactoryInitialization(beanFactory);
 
-                // Last step: publish corresponding event.
+                // 发布事件回调 dispatchServlet也是通过他来完成
                 finishRefresh();
             }
 
@@ -111,10 +112,10 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
                 }
 
                 // Destroy already created singletons to avoid dangling resources.
-                destroyBeans();
-
-                // Reset 'active' flag.
-                cancelRefresh(ex);
+//                destroyBeans();
+//
+//                // Reset 'active' flag.
+//                cancelRefresh(ex);
 
                 // Propagate exception to caller.
                 throw ex;
@@ -123,10 +124,17 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
             finally {
                 // Reset common introspection caches in Spring's core, since we
                 // might not ever need metadata for singleton beans anymore...
-                resetCommonCaches();
+//                resetCommonCaches();
             }
         }
     }
+    protected void finishRefresh() {
+        // Publish the final event.
+        publishEvent(new MyContextRefreshedEvent(this));
+
+    }
+
+
 
     protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
         // Initialize conversion service for this context.
@@ -201,6 +209,7 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
 
     protected void initApplicationEventMulticaster() {
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+        //if不成立
         if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
             this.applicationEventMulticaster =
                     beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, MyApplicationEventMulticaster.class);
@@ -292,6 +301,12 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
 
     public abstract ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
 
+    protected BeanFactory getInternalParentBeanFactory() {
+        //返回值为空
+        return (getParent() instanceof MyConfigurableApplicationContext) ?
+                ((MyConfigurableApplicationContext) getParent()).getBeanFactory() : getParent();
+    }
+
     @Override
     public ConfigurableEnvironment getEnvironment() {
         if (this.environment == null) {
@@ -320,7 +335,7 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
     }
 
     protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-        // // 设置classLoader(用于加载bean)
+        // 设置classLoader(用于加载bean) 获取到的结果 WebappclassLoader
         beanFactory.setBeanClassLoader(getClassLoader());
         // 设置表达式解析器StandardBeanExpressionResolver(解析bean定义中的一些表达式)
         beanFactory.setBeanExpressionResolver(new MyStandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
@@ -383,6 +398,7 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
         }
     }
     protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+//        创建默认bean工厂
         refreshBeanFactory();
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
         if (logger.isDebugEnabled()) {
@@ -393,5 +409,10 @@ public abstract class MyAbstractApplicationContext extends DefaultResourceLoader
 
     protected void initPropertySources() {
         // For subclasses: do nothing by default.
+    }
+
+    protected abstract void closeBeanFactory();
+    protected void destroyBeans() {
+        getBeanFactory().destroySingletons();
     }
 }

@@ -1,6 +1,6 @@
 package org.springframework.web.context.support;
 
-import org.springframework.context.ApplicationEvent;
+import org.springframework.context.MyApplicationEvent;
 import org.springframework.lang.Nullable;
 
 /**
@@ -9,7 +9,7 @@ import org.springframework.lang.Nullable;
  * @author zwd
  * @since 2019-05-25
  **/
-public class MyRequestHandledEvent extends ApplicationEvent {
+public class MyRequestHandledEvent extends MyApplicationEvent {
 
 
     @Nullable

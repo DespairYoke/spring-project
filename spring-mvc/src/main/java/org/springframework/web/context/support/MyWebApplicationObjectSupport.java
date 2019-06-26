@@ -1,7 +1,7 @@
 package org.springframework.web.context.support;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.context.MyApplicationContext;
+import org.springframework.context.support.MyApplicationObjectSupport;
 import org.springframework.web.context.MyWebApplicationContext;
 
 import javax.servlet.ServletContext;
@@ -12,7 +12,7 @@ import javax.servlet.ServletContext;
  * @author zwd
  * @since 2019-05-27
  **/
-public abstract class MyWebApplicationObjectSupport extends ApplicationObjectSupport  {
+public abstract class MyWebApplicationObjectSupport extends MyApplicationObjectSupport {
 
     private ServletContext servletContext;
 
@@ -21,7 +21,7 @@ public abstract class MyWebApplicationObjectSupport extends ApplicationObjectSup
     }
 
     protected final MyWebApplicationContext getWebApplicationContext() throws IllegalStateException {
-        ApplicationContext ctx = getApplicationContext();
+        MyApplicationContext ctx = getApplicationContext();
         if (ctx instanceof MyWebApplicationContext) {
             return (MyWebApplicationContext) getApplicationContext();
         }

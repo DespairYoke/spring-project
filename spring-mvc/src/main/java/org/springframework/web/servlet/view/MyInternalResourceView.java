@@ -45,9 +45,6 @@ public class MyInternalResourceView extends MyAbstractUrlBasedView{
 
 
 
-    protected void exposeHelpers(HttpServletRequest request) throws Exception {
-    }
-
     @Override
     protected void renderMergedOutputModel(
             Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -56,7 +53,7 @@ public class MyInternalResourceView extends MyAbstractUrlBasedView{
         exposeModelAsRequestAttributes(model, request);
 
         // Expose helpers as request attributes, if any.
-        exposeHelpers(request);
+//        exposeHelpers(request);
 
         // Determine the path for the request dispatcher.
         String dispatcherPath = prepareForRendering(request, response);

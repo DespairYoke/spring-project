@@ -1,8 +1,7 @@
 package org.springframework.web.servlet.support;
 
-import org.springframework.context.MessageSource;
-import org.springframework.context.support.MessageSourceResourceBundle;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.MyMessageSource;
+import org.springframework.context.support.MyResourceBundleMessageSource;
 import org.springframework.lang.Nullable;
 
 import javax.servlet.ServletContext;
@@ -22,8 +21,8 @@ import java.util.TimeZone;
  **/
 public class MyJstlUtils {
 
-    public static MessageSource getJstlAwareMessageSource(
-            @Nullable ServletContext servletContext, MessageSource messageSource) {
+    public static MyMessageSource getJstlAwareMessageSource(
+            @Nullable ServletContext servletContext, MyMessageSource messageSource) {
 
         if (servletContext != null) {
             String jstlInitParam = servletContext.getInitParameter(Config.FMT_LOCALIZATION_CONTEXT);
@@ -31,7 +30,7 @@ public class MyJstlUtils {
                 // Create a ResourceBundleMessageSource for the specified resource bundle
                 // basename in the JSTL context-param in web.xml, wiring it with the given
                 // Spring-defined MessageSource as parent.
-                ResourceBundleMessageSource jstlBundleWrapper = new ResourceBundleMessageSource();
+                MyResourceBundleMessageSource jstlBundleWrapper = new MyResourceBundleMessageSource();
                 jstlBundleWrapper.setBasename(jstlInitParam);
                 jstlBundleWrapper.setParentMessageSource(messageSource);
                 return jstlBundleWrapper;
@@ -39,67 +38,67 @@ public class MyJstlUtils {
         }
         return messageSource;
     }
-    public static void exposeLocalizationContext(MyRequestContext requestContext) {
-        Config.set(requestContext.getRequest(), Config.FMT_LOCALE, requestContext.getLocale());
-        TimeZone timeZone = requestContext.getTimeZone();
-        if (timeZone != null) {
-            Config.set(requestContext.getRequest(), Config.FMT_TIME_ZONE, timeZone);
-        }
-        MessageSource messageSource = getJstlAwareMessageSource(
-                requestContext.getServletContext(), requestContext.getMessageSource());
-        LocalizationContext jstlContext = new SpringLocalizationContext(messageSource, requestContext.getRequest());
-        Config.set(requestContext.getRequest(), Config.FMT_LOCALIZATION_CONTEXT, jstlContext);
-    }
+//    public static void exposeLocalizationContext(MyRequestContext requestContext) {
+//        Config.set(requestContext.getRequest(), Config.FMT_LOCALE, requestContext.getLocale());
+//        TimeZone timeZone = requestContext.getTimeZone();
+//        if (timeZone != null) {
+//            Config.set(requestContext.getRequest(), Config.FMT_TIME_ZONE, timeZone);
+//        }
+//        MessageSource messageSource = getJstlAwareMessageSource(
+//                requestContext.getServletContext(), requestContext.getMessageSource());
+//        LocalizationContext jstlContext = new SpringLocalizationContext(messageSource, requestContext.getRequest());
+//        Config.set(requestContext.getRequest(), Config.FMT_LOCALIZATION_CONTEXT, jstlContext);
+//    }
 
 
 
-    public static void exposeLocalizationContext(HttpServletRequest request, @Nullable MessageSource messageSource) {
-        Locale jstlLocale = MyRequestContextUtils.getLocale(request);
-        Config.set(request, Config.FMT_LOCALE, jstlLocale);
-        TimeZone timeZone = MyRequestContextUtils.getTimeZone(request);
-        if (timeZone != null) {
-            Config.set(request, Config.FMT_TIME_ZONE, timeZone);
-        }
-        if (messageSource != null) {
-            LocalizationContext jstlContext = new SpringLocalizationContext(messageSource, request);
-            Config.set(request, Config.FMT_LOCALIZATION_CONTEXT, jstlContext);
-        }
-    }
+//    public static void exposeLocalizationContext(HttpServletRequest request, @Nullable MyMessageSource messageSource) {
+//        Locale jstlLocale = MyRequestContextUtils.getLocale(request);
+//        Config.set(request, Config.FMT_LOCALE, jstlLocale);
+//        TimeZone timeZone = MyRequestContextUtils.getTimeZone(request);
+//        if (timeZone != null) {
+//            Config.set(request, Config.FMT_TIME_ZONE, timeZone);
+//        }
+//        if (messageSource != null) {
+//            LocalizationContext jstlContext = new SpringLocalizationContext(messageSource, request);
+//            Config.set(request, Config.FMT_LOCALIZATION_CONTEXT, jstlContext);
+//        }
+//    }
 
-    private static class SpringLocalizationContext extends LocalizationContext {
-
-        private final MessageSource messageSource;
-
-        private final HttpServletRequest request;
-
-        public SpringLocalizationContext(MessageSource messageSource, HttpServletRequest request) {
-            this.messageSource = messageSource;
-            this.request = request;
-        }
-
-        @Override
-        public ResourceBundle getResourceBundle() {
-            HttpSession session = this.request.getSession(false);
-            if (session != null) {
-                Object lcObject = Config.get(session, Config.FMT_LOCALIZATION_CONTEXT);
-                if (lcObject instanceof LocalizationContext) {
-                    ResourceBundle lcBundle = ((LocalizationContext) lcObject).getResourceBundle();
-                    return new MessageSourceResourceBundle(this.messageSource, getLocale(), lcBundle);
-                }
-            }
-            return new MessageSourceResourceBundle(this.messageSource, getLocale());
-        }
-
-        @Override
-        public Locale getLocale() {
-            HttpSession session = this.request.getSession(false);
-            if (session != null) {
-                Object localeObject = Config.get(session, Config.FMT_LOCALE);
-                if (localeObject instanceof Locale) {
-                    return (Locale) localeObject;
-                }
-            }
-            return MyRequestContextUtils.getLocale(this.request);
-        }
-    }
+//    private static class SpringLocalizationContext extends LocalizationContext {
+//
+//        private final MyMessageSource messageSource;
+//
+//        private final HttpServletRequest request;
+//
+//        public SpringLocalizationContext(MyMessageSource messageSource, HttpServletRequest request) {
+//            this.messageSource = messageSource;
+//            this.request = request;
+//        }
+//
+//        @Override
+//        public ResourceBundle getResourceBundle() {
+//            HttpSession session = this.request.getSession(false);
+//            if (session != null) {
+//                Object lcObject = Config.get(session, Config.FMT_LOCALIZATION_CONTEXT);
+//                if (lcObject instanceof LocalizationContext) {
+//                    ResourceBundle lcBundle = ((LocalizationContext) lcObject).getResourceBundle();
+//                    return new MessageSourceResourceBundle(this.messageSource, getLocale(), lcBundle);
+//                }
+//            }
+//            return new MessageSourceResourceBundle(this.messageSource, getLocale());
+//        }
+//
+//        @Override
+//        public Locale getLocale() {
+//            HttpSession session = this.request.getSession(false);
+//            if (session != null) {
+//                Object localeObject = Config.get(session, Config.FMT_LOCALE);
+//                if (localeObject instanceof Locale) {
+//                    return (Locale) localeObject;
+//                }
+//            }
+//            return MyRequestContextUtils.getLocale(this.request);
+//        }
+//    }
 }

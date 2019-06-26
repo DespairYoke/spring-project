@@ -16,4 +16,8 @@ class MyContextTypeMatchClassLoader extends DecoratingClassLoader implements Sma
         super(parent);
     }
 
+    @Override
+    public boolean isClassReloadable(Class<?> aClass) {
+        return false;
+    }
 }

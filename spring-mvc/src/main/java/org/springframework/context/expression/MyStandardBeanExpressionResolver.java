@@ -1,5 +1,7 @@
 package org.springframework.context.expression;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanExpressionContext;
 import org.springframework.beans.factory.config.BeanExpressionResolver;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelParserConfiguration;
@@ -29,4 +31,8 @@ public class MyStandardBeanExpressionResolver implements BeanExpressionResolver 
         this.expressionParser = new SpelExpressionParser(new SpelParserConfiguration(null, beanClassLoader));
     }
 
+    @Override
+    public Object evaluate(String s, BeanExpressionContext beanExpressionContext) throws BeansException {
+        return null;
+    }
 }

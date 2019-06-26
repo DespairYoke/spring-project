@@ -32,4 +32,7 @@ public abstract class MyAbstractRefreshableWebApplicationContext extends MyAbstr
         this.servletContext = servletContext;
     }
 
+    public String[] getConfigLocations() {
+        return super.getConfigLocations();
+    }
 }

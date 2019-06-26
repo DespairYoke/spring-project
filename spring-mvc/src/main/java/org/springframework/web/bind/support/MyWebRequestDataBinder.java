@@ -43,7 +43,7 @@ public class MyWebRequestDataBinder extends MyWebDataBinder {
                 }
             }
         }
-        doBind(mpvs);
+//        doBind(mpvs);
     }
 
 

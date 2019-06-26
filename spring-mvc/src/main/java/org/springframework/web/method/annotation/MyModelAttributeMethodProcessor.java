@@ -1,15 +1,13 @@
 package org.springframework.web.method.annotation;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.util.Assert;
-import org.springframework.validation.AbstractBindingResult;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
+import org.springframework.validation.MyBindException;
+import org.springframework.validation.MyBindingResult;
+import org.springframework.validation.MyErrors;
 import org.springframework.web.bind.MyWebDataBinder;
 import org.springframework.web.bind.annotation.MyModelAttribute;
 import org.springframework.web.bind.support.MyWebDataBinderFactory;
@@ -21,6 +19,7 @@ import org.springframework.web.method.support.MyModelAndViewContainer;
 
 import java.beans.ConstructorProperties;
 import java.lang.reflect.Constructor;
+import java.net.BindException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,7 +62,7 @@ public class MyModelAttributeMethodProcessor implements MyHandlerMethodArgumentR
         }
 
         Object attribute = null;
-        BindingResult bindingResult = null;
+        MyBindingResult bindingResult = null;
 
         if (mavContainer.containsAttribute(name)) {
             attribute = mavContainer.getModel().get(name);
@@ -73,7 +72,7 @@ public class MyModelAttributeMethodProcessor implements MyHandlerMethodArgumentR
             try {
                 attribute = createAttribute(name, parameter, binderFactory, webRequest);
             }
-            catch (BindException ex) {
+            catch (MyBindException ex) {
                 if (isBindExceptionRequired(parameter)) {
                     // No BindingResult parameter -> fail with BindException
                     throw ex;
@@ -87,22 +86,22 @@ public class MyModelAttributeMethodProcessor implements MyHandlerMethodArgumentR
         }
 
         if (bindingResult == null) {
-            // Bean property binding and validation;
-            // skipped in case of binding failure on construction.
-            MyWebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);
-            if (binder.getTarget() != null) {
-                if (!mavContainer.isBindingDisabled(name)) {
-                    bindRequestParameters(binder, webRequest);
-                }
-                if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
-                    throw new BindException(binder.getBindingResult());
-                }
-            }
-            // Value type adaptation, also covering java.util.Optional
-            if (!parameter.getParameterType().isInstance(attribute)) {
-                attribute = binder.convertIfNecessary(binder.getTarget(), parameter.getParameterType(), parameter);
-            }
-            bindingResult = binder.getBindingResult();
+//            // Bean property binding and validation;
+//            // skipped in case of binding failure on construction.
+//            MyWebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);
+//            if (binder.getTarget() != null) {
+//                if (!mavContainer.isBindingDisabled(name)) {
+//                    bindRequestParameters(binder, webRequest);
+//                }
+//                if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
+//                    throw new BindException(binder.getBindingResult());
+//                }
+//            }
+//            // Value type adaptation, also covering java.util.Optional
+//            if (!parameter.getParameterType().isInstance(attribute)) {
+//                attribute = binder.convertIfNecessary(binder.getTarget(), parameter.getParameterType(), parameter);
+//            }
+//            bindingResult = binder.getBindingResult();
         }
 
         // Add resolved attribute and BindingResult at the end of the model
@@ -126,7 +125,7 @@ public class MyModelAttributeMethodProcessor implements MyHandlerMethodArgumentR
     protected boolean isBindExceptionRequired(MethodParameter parameter) {
         int i = parameter.getParameterIndex();
         Class<?>[] paramTypes = parameter.getExecutable().getParameterTypes();
-        boolean hasBindingResult = (paramTypes.length > (i + 1) && Errors.class.isAssignableFrom(paramTypes[i + 1]));
+        boolean hasBindingResult = (paramTypes.length > (i + 1) && MyErrors.class.isAssignableFrom(paramTypes[i + 1]));
         return !hasBindingResult;
     }
 

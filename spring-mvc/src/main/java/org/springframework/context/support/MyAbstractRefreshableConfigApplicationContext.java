@@ -11,4 +11,13 @@ import org.springframework.beans.factory.InitializingBean;
  **/
 public abstract class MyAbstractRefreshableConfigApplicationContext extends MyAbstractRefreshableApplicationContext
         implements BeanNameAware, InitializingBean {
+
+    private String[] configLocations;
+
+    protected String[] getConfigLocations() {
+        return (this.configLocations != null ? this.configLocations : getDefaultConfigLocations());
+    }
+    protected String[] getDefaultConfigLocations() {
+        return null;
+    }
 }

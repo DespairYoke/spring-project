@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.DataBinder;
+import org.springframework.validation.MyDataBinder;
 
 import org.springframework.web.bind.MyServletRequestDataBinder;
 import org.springframework.web.bind.MyWebDataBinder;
@@ -124,7 +124,7 @@ public class MyServletModelAttributeMethodProcessor extends MyModelAttributeMeth
                                                      MethodParameter parameter, MyWebDataBinderFactory binderFactory, MyNativeWebRequest request)
             throws Exception {
 
-        DataBinder binder = binderFactory.createBinder(request, null, attributeName);
+        MyDataBinder binder = binderFactory.createBinder(request, null, attributeName);
         ConversionService conversionService = binder.getConversionService();
         if (conversionService != null) {
             TypeDescriptor source = TypeDescriptor.valueOf(String.class);

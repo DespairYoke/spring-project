@@ -1,7 +1,6 @@
 package com.zwd.web.controller;
 
-import org.springframework.stereotype.Controller;
-
+import org.springframework.stereotype.MyController;
 import org.springframework.web.bind.annotation.MyGetMapping;
 import org.springframework.web.bind.annotation.MyRequestMapping;
 import org.springframework.web.servlet.MyModelAndView;
@@ -12,7 +11,7 @@ import org.springframework.web.servlet.MyModelAndView;
  * @author zwd
  * @since 2019-04-22
  **/
-@Controller
+@MyController
 public class HelloController {
 
     @MyGetMapping(value = "hello")

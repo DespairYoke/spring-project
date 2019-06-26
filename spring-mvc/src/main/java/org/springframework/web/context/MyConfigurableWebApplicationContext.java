@@ -1,6 +1,5 @@
 package org.springframework.web.context;
 
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.MyConfigurableApplicationContext;
 import org.springframework.lang.Nullable;
 

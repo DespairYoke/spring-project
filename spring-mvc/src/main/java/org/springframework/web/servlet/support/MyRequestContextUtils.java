@@ -1,12 +1,12 @@
 package org.springframework.web.servlet.support;
 
-import org.springframework.context.i18n.LocaleContext;
-import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
+import org.springframework.context.i18n.MyLocaleContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.MyWebApplicationContext;
 import org.springframework.web.servlet.*;
+import org.springframework.web.servlet.i18n.MyTimeZoneAwareLocaleContext;
 import org.springframework.web.util.MyUriComponents;
 import org.springframework.web.util.MyUriComponentsBuilder;
 
@@ -45,9 +45,9 @@ public abstract class MyRequestContextUtils {
     public static TimeZone getTimeZone(HttpServletRequest request) {
         MyLocaleResolver localeResolver = getLocaleResolver(request);
         if (localeResolver instanceof MyLocaleContextResolver) {
-            LocaleContext localeContext = ((MyLocaleContextResolver) localeResolver).resolveLocaleContext(request);
-            if (localeContext instanceof TimeZoneAwareLocaleContext) {
-                return ((TimeZoneAwareLocaleContext) localeContext).getTimeZone();
+            MyLocaleContext localeContext = ((MyLocaleContextResolver) localeResolver).resolveLocaleContext(request);
+            if (localeContext instanceof MyTimeZoneAwareLocaleContext) {
+                return ((MyTimeZoneAwareLocaleContext) localeContext).getTimeZone();
             }
         }
         return null;

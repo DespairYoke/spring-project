@@ -1,6 +1,6 @@
 package org.springframework.web.servlet;
 
-import org.springframework.context.i18n.LocaleContext;
+import org.springframework.context.i18n.MyLocaleContext;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,5 +12,5 @@ import javax.servlet.http.HttpServletRequest;
  **/
 public interface MyLocaleContextResolver extends MyLocaleResolver{
 
-    LocaleContext resolveLocaleContext(HttpServletRequest request);
+    MyLocaleContext resolveLocaleContext(HttpServletRequest request);
 }

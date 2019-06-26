@@ -2,8 +2,7 @@ package org.springframework.web.method.support;
 
 import org.springframework.http.MyHttpStatus;
 import org.springframework.lang.Nullable;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.support.BindingAwareModelMap;
+
 import org.springframework.web.bind.support.MySessionStatus;
 import org.springframework.web.bind.support.MySimpleSessionStatus;
 
@@ -19,7 +18,7 @@ public class MyModelAndViewContainer {
 
     private boolean ignoreDefaultModelOnRedirect = false;
 
-    private final ModelMap defaultModel = new BindingAwareModelMap();
+    private final MyModelMap defaultModel = new MyBindingAwareModelMap();
 
     private Object view;
     @Nullable
